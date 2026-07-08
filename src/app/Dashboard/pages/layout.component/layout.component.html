@@ -1,0 +1,10 @@
+<app-barralateral></app-barralateral>
+<app-barrasuperior></app-barrasuperior>
+
+<main class="main-content">
+  <div style="padding: 24px;">
+    <app-top-canchas [rawData]="bookingsData"></app-top-canchas>
+  </div>
+  <!-- El contenido de las páginas de tu dashboard se renderizará aquí -->
+  <router-outlet></router-outlet>
+</main>

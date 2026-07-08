@@ -1,0 +1,19 @@
+.main-content {
+  /* Margen superior igual a la altura de la barra superior */
+  margin-top: 60px;
+
+  /* Margen izquierdo igual al ancho de la barra lateral */
+  margin-left: 250px;
+
+  /* Espaciado interno para que el contenido no pegue con los bordes */
+  padding: 20px;
+
+  /* Un color de fondo para diferenciar el área de contenido */
+  background-color: #f4f7f6;
+
+  /* Ocupa el resto de la altura visible, restando la barra superior */
+  height: calc(100vh - 60px);
+
+  /* Habilita el scroll vertical si el contenido excede la altura */
+  overflow-y: auto;
+}

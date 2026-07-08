@@ -1,0 +1,9 @@
+.main-content {
+  margin-top: 72px;   /* Altura de la barra superior */
+  margin-left: 185px; /* Ancho de la barra lateral */
+  padding: 24px;
+  background-color: #f8f7ff;
+  min-height: calc(100vh - 72px);
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+}

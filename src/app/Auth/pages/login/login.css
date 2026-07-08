@@ -1,0 +1,406 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ===== BACKGROUND ===== */
+.login-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #1a0533 0%, #2d1065 40%, #4c1d95 70%, #7c3aed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* ===== ANIMATED BLOBS ===== */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: blobFloat 8s ease-in-out infinite alternate;
+}
+
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #a855f7, #7c3aed);
+  top: -150px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #3b82f6, #8b5cf6);
+  bottom: -100px;
+  right: -80px;
+  animation-delay: 2s;
+}
+
+.blob-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #ec4899, #a855f7);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 4s;
+}
+
+@keyframes blobFloat {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(30px, -30px) scale(1.08); }
+  100% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* ===== WRAPPER ===== */
+.login-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 900px;
+  max-width: 96vw;
+  min-height: 540px;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* ===== BRAND PANEL (left) ===== */
+.brand-panel {
+  flex: 0 0 340px;
+  background: linear-gradient(160deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-panel::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+.brand-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -40px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+
+.brand-logo {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.brand-logo mat-icon {
+  color: #fff;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.brand-name {
+  margin: 0;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.brand-sub {
+  margin: 4px 0 0;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.brand-divider {
+  width: 50px;
+  height: 3px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 2px;
+  margin: 22px 0;
+}
+
+.brand-desc {
+  margin: 0 0 28px;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.brand-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s;
+}
+
+.tag mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.tag:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* ===== FORM PANEL (right) ===== */
+.form-panel {
+  flex: 1;
+  background: rgba(15, 5, 35, 0.85);
+  backdrop-filter: blur(30px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 40px;
+}
+
+.form-inner {
+  width: 100%;
+  max-width: 360px;
+}
+
+/* ===== FORM HEADER ===== */
+.form-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.form-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5);
+}
+
+.form-icon mat-icon {
+  color: #fff;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.form-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.form-header p {
+  margin: 8px 0 0;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+}
+
+/* ===== FIELDS ===== */
+.field-wrapper {
+  margin-bottom: 4px;
+}
+
+.custom-field {
+  width: 100%;
+}
+
+/* Override Angular Material colors for dark theme */
+.custom-field ::ng-deep .mat-mdc-form-field-flex {
+  background: rgba(255,255,255,0.06) !important;
+  border-radius: 12px !important;
+}
+
+.custom-field ::ng-deep .mdc-notched-outline__leading,
+.custom-field ::ng-deep .mdc-notched-outline__notch,
+.custom-field ::ng-deep .mdc-notched-outline__trailing {
+  border-color: rgba(255,255,255,0.15) !important;
+}
+
+.custom-field:hover ::ng-deep .mdc-notched-outline__leading,
+.custom-field:hover ::ng-deep .mdc-notched-outline__notch,
+.custom-field:hover ::ng-deep .mdc-notched-outline__trailing {
+  border-color: rgba(168, 85, 247, 0.6) !important;
+}
+
+.custom-field ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.custom-field ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.custom-field ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #a855f7 !important;
+}
+
+.custom-field ::ng-deep .mat-mdc-input-element {
+  color: #fff !important;
+  caret-color: #a855f7 !important;
+}
+
+.custom-field ::ng-deep .mat-mdc-floating-label {
+  color: rgba(255,255,255,0.5) !important;
+}
+
+.custom-field ::ng-deep .mat-mdc-form-field-icon-suffix mat-icon {
+  color: rgba(255,255,255,0.4) !important;
+}
+
+/* ===== AUTH FORM ===== */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===== BUTTONS ===== */
+.auth-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-login {
+  flex: 2;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+  transition: all 0.25s ease;
+  letter-spacing: 0.2px;
+}
+
+.btn-login mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.btn-login:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6d28d9, #9333ea);
+  box-shadow: 0 12px 35px rgba(124, 58, 237, 0.65);
+  transform: translateY(-2px);
+}
+
+.btn-login:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-clear {
+  flex: 1;
+  height: 50px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+
+.btn-clear mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.btn-clear:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+/* ===== FOOTER ===== */
+.footer-note {
+  text-align: center;
+  color: rgba(255,255,255,0.25);
+  font-size: 12px;
+  margin-top: 28px;
+  margin-bottom: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .login-wrapper {
+    flex-direction: column;
+    min-height: auto;
+    border-radius: 20px;
+    width: 95vw;
+  }
+
+  .brand-panel {
+    flex: none;
+    padding: 30px 28px;
+  }
+
+  .brand-tags {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .form-panel {
+    padding: 30px 24px;
+  }
+}
