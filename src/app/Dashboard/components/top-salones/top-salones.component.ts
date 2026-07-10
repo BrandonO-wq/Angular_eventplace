@@ -12,15 +12,15 @@ interface VenueStats {
 }
 
 @Component({
-  selector: 'app-top-canchas',
+  selector: 'app-top-salones',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './top-canchas.component.html',
-  styleUrls: ['./top-canchas.component.css']
+  templateUrl: './top-salones.component.html',
+  styleUrls: ['./top-salones.component.css']
 })
-export class TopCanchasComponent implements OnInit, OnChanges {
+export class TopSalonesComponent implements OnInit, OnChanges {
   @Input() rawData: any[] = [];
-  
+
   topVenues: VenueStats[] = [];
 
   ngOnInit() {
@@ -35,10 +35,9 @@ export class TopCanchasComponent implements OnInit, OnChanges {
 
   processData() {
     const data = this.rawData || [];
-
     const venueMap = new Map<string, VenueStats>();
-    
-    data.forEach(b => {
+
+    data.forEach((b: any) => {
       if (!venueMap.has(b.venueId)) {
         venueMap.set(b.venueId, {
           id: b.venueId,

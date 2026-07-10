@@ -1,0 +1,74 @@
+<div class="card">
+  <h3 class="card-title">Evolución de Comisiones</h3>
+
+  @if (months.length === 0) {
+    <div class="empty-state">Sin datos de comisiones disponibles.</div>
+  } @else {
+    <div class="chart-container">
+      <svg [attr.viewBox]="'0 0 ' + svgWidth + ' ' + svgHeight" class="chart-svg" preserveAspectRatio="xMidYMid meet">
+
+        <!-- Horizontal Grid Lines & Y Labels -->
+        @for (tick of yTicks; track tick) {
+          <line
+            [attr.x1]="padLeft" [attr.y1]="yLabelX(tick)"
+            [attr.x2]="svgWidth - padRight" [attr.y2]="yLabelX(tick)"
+            stroke="#f0f0f0" stroke-width="1"/>
+          <text
+            [attr.x]="padLeft - 4" [attr.y]="yLabelX(tick) + 4"
+            text-anchor="end" class="axis-label">{{ yLabel(tick) }}</text>
+        }
+
+        <!-- Bottom axis line -->
+        <line
+          [attr.x1]="padLeft" [attr.y1]="svgHeight - padBottom"
+          [attr.x2]="svgWidth - padRight" [attr.y2]="svgHeight - padBottom"
+          stroke="#e0e0e0" stroke-width="1.5"/>
+
+        <!-- X Labels (months) -->
+        @for (m of months; track m.label; let i = $index) {
+          <text
+            [attr.x]="padLeft + (i / (months.length > 1 ? months.length - 1 : 1)) * (svgWidth - padLeft - padRight)"
+            [attr.y]="svgHeight - padBottom + 16"
+            text-anchor="middle" class="axis-label">{{ m.label }}</text>
+        }
+
+        <!-- Blue Area (Reservas) -->
+        <path [attr.d]="areaPath" fill="#e0f2fe" opacity="0.6"/>
+
+        <!-- Blue Line (Reservas) -->
+        <path [attr.d]="reservasPath" fill="none" stroke="#3b82f6" stroke-width="2"/>
+        @for (dot of reservasDots; track dot.cx) {
+          <circle [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="4" fill="#3b82f6"/>
+        }
+
+        <!-- Green Line (Comisiones) -->
+        <path [attr.d]="comisionesPath" fill="none" stroke="#22c55e" stroke-width="2"/>
+        @for (dot of comisionesDots; track dot.cx) {
+          <circle [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="3" fill="#22c55e"/>
+        }
+
+        <!-- Orange Line (Pendientes) -->
+        <path [attr.d]="pendientesPath" fill="none" stroke="#f97316" stroke-width="2"/>
+        @for (dot of pendientesDots; track dot.cx) {
+          <circle [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="3" fill="#f97316"/>
+        }
+
+      </svg>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-box" style="border: 2px solid #22c55e;"></div>
+        <span>Comisiones (S/)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="border: 2px solid #f97316;"></div>
+        <span>Pendientes por cobrar (S/)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="border: 2px solid #3b82f6; background-color: #e0f2fe;"></div>
+        <span>Reservas (S/)</span>
+      </div>
+    </div>
+  }
+</div>

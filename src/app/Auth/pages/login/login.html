@@ -54,13 +54,20 @@
             </mat-form-field>
           </div>
 
+          @if (errorMessage) {
+            <div class="error-message">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+
           <div class="auth-actions">
             <button class="btn-login" type="submit" [disabled]="loginForm.invalid">
               <mat-icon>login</mat-icon>
               Iniciar Sesión
             </button>
 
-            <button class="btn-clear" type="button" (click)="loginForm.resetForm()">
+            <button class="btn-clear" type="button" (click)="loginForm.resetForm(); clearForm()">
               <mat-icon>refresh</mat-icon>
               Limpiar
             </button>

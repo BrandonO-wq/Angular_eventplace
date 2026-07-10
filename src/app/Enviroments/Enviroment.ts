@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://a5a6-200-106-127-127.ngrok-free.app'
+  apiUrl: 'https://a75c-200-106-127-127.ngrok-free.app'
+  //API_URL=https://api.oryzentprueba.com
 };

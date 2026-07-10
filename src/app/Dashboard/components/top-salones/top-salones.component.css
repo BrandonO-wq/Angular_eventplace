@@ -1,4 +1,4 @@
-.top-canchas-container {
+.top-salones-container {
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -53,13 +53,13 @@ h2 {
   overflow-x: auto;
 }
 
-.top-canchas-table {
+.top-salones-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
 
-.top-canchas-table th {
+.top-salones-table th {
   text-align: left;
   padding: 12px 16px;
   color: #666;
@@ -69,18 +69,18 @@ h2 {
   white-space: nowrap;
 }
 
-.top-canchas-table td {
+.top-salones-table td {
   padding: 16px;
   vertical-align: middle;
   border-bottom: 1px solid #f5f5f5;
   font-size: 0.95rem;
 }
 
-.top-canchas-table tbody tr:hover {
+.top-salones-table tbody tr:hover {
   background-color: #fafafa;
 }
 
-.top-canchas-table tbody tr:last-child td {
+.top-salones-table tbody tr:last-child td {
   border-bottom: none;
 }
 
@@ -97,7 +97,11 @@ h2 {
   color: #777;
 }
 
-.rank-1, .rank-2, .rank-3, .rank-4, .rank-5 {
+.rank-1,
+.rank-2,
+.rank-3,
+.rank-4,
+.rank-5 {
   background-color: #fff8e1;
   color: #f57f17;
 }

@@ -16,9 +16,9 @@ export class AuthService {
 
   private apiUrl = environment.apiUrl;
   private http = inject(HttpClient);
-  
+
   login(credentials: AuthRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials, {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/admin/login`, credentials, {
       headers: {
         'ngrok-skip-browser-warning': '69420'
       }

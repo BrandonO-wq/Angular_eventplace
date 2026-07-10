@@ -1,0 +1,40 @@
+<div class="card">
+  <div class="card-header">
+    <div class="title-container">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="chart-icon">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <h3 class="card-title">Top 5 - Más Reservadas</h3>
+    </div>
+  </div>
+
+  <div class="card-body">
+    @if (venues.length === 0) {
+      <div class="empty-state">Sin datos de reservas</div>
+    } @else {
+      <div class="simple-chart">
+        <!-- X-axis grid lines -->
+        <div class="chart-grid">
+          <div class="grid-line" style="left: 0%;"><span>0</span></div>
+          <div class="grid-line" style="left: 33%;"><span>{{ (maxBookings / 3) | number:'1.0-0' }}</span></div>
+          <div class="grid-line" style="left: 66%;"><span>{{ (maxBookings * 2 / 3) | number:'1.0-0' }}</span></div>
+          <div class="grid-line" style="left: 100%;"><span>{{ maxBookings }}</span></div>
+        </div>
+
+        @for (venue of venues; track venue.id) {
+          <div class="chart-item">
+            <div class="item-label" [title]="venue.name">{{ venue.name }}</div>
+            <div class="item-bar-container">
+              <div class="item-bar" [style.width]="getBarWidth(venue.bookingsCount)">
+                <span class="bar-value">{{ venue.bookingsCount }}</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

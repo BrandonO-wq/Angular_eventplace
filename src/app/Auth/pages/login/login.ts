@@ -23,13 +23,16 @@ export class Login {
   private router = inject(Router);
   username = '';
   password = '';
+  errorMessage: string | null = null;
 
 clearForm(){
   this.username = '';
   this.password = '';
+  this.errorMessage = null;
 }
 
 onLogin() {
+    this.errorMessage = null;
     const credentials = {
       email: this.username,
       password: this.password
@@ -42,6 +45,7 @@ this.AuthService.login(credentials).subscribe({
       },
       error: (err) => {
         console.error('Error en las credenciales', err);
+        this.errorMessage = 'Correo electrónico o contraseña incorrectos.';
       }
     });
   }

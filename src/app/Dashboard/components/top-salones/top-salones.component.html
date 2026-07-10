@@ -1,0 +1,50 @@
+<div class="top-salones-container">
+  <div class="header">
+    <div class="title-container">
+      <span class="ribbon-icon">🏆</span>
+      <h2>Top 5 - Salones Mejor Calificados</h2>
+    </div>
+    <button class="ver-todas-btn">Ver todas</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="top-salones-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Salón</th>
+          <th>Propietario</th>
+          <th>Deporte</th>
+          <th>Calificación</th>
+          <th>Reseñas</th>
+          <th class="text-right">Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (venue of topVenues; track venue.id; let i = $index) {
+          <tr>
+            <td>
+              <div class="index-badge" [ngClass]="'rank-' + (i + 1)">{{ i + 1 }}</div>
+            </td>
+            <td class="font-bold">{{ venue.name }}</td>
+            <td class="text-muted">{{ venue.owner }}</td>
+            <td>
+              <span class="sport-badge">{{ venue.sport }}</span>
+            </td>
+            <td>
+              <span class="rating-star">⭐</span>
+              <span class="font-bold">{{ venue.rating | number:'1.1-1' }}</span>
+            </td>
+            <td class="text-muted">{{ venue.reviews }} reseñas</td>
+            <td class="text-right income-text">S/ {{ venue.income | number:'1.0-0' }}</td>
+          </tr>
+        }
+        @if (topVenues.length === 0) {
+          <tr>
+            <td colspan="7" class="text-center">No hay datos disponibles</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

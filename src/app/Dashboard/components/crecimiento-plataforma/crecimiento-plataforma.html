@@ -1,0 +1,58 @@
+<div class="card">
+  <h3 class="card-title">Crecimiento de la Plataforma</h3>
+
+  <div class="chart-wrapper">
+    <svg class="chart-svg" viewBox="0 0 700 220" preserveAspectRatio="none">
+      <!-- Grid lines and labels -->
+      @for (line of gridLines; track line.y) {
+        <line x1="50" [attr.y1]="line.y" x2="690" [attr.y2]="line.y" stroke="#e5e7eb" stroke-width="1" />
+        <text x="44" [attr.y]="line.y + 4" text-anchor="end" class="y-label">{{ line.value | number:'1.0-1' }}</text>
+      }
+
+      <!-- X-axis labels -->
+      @for (month of months; track $index) {
+        <text [attr.x]="xCoords[$index]" y="215" text-anchor="middle" class="x-label">{{ month }}</text>
+      }
+
+      <!-- Blue area fill for "Salones Registradas" -->
+      <path [attr.d]="salonesArea" fill="#dbeafe" opacity="0.5" />
+
+      <!-- Blue line - Salones Registradas -->
+      <path [attr.d]="salonesPath" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" />
+      
+      <!-- Dots for Salones -->
+      @for (val of salonesPoints; track $index) {
+        <circle [attr.cx]="xCoords[$index]" [attr.cy]="getYCoord(val)" r="4" fill="#3b82f6" />
+      }
+
+      <!-- Green area fill for "Propietarios" -->
+      <path [attr.d]="propietariosArea" fill="#dcfce7" opacity="0.4" />
+
+      <!-- Green line - Propietarios -->
+      <path [attr.d]="propietariosPath" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round" stroke-dasharray="6 4" />
+      
+      <!-- Dots for Propietarios -->
+      @for (val of propietariosPoints; track $index) {
+        <circle [attr.cx]="xCoords[$index]" [attr.cy]="getYCoord(val)" r="3" fill="#22c55e" />
+      }
+    </svg>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-line blue-line"></div>
+      <div class="legend-text">
+        <span class="legend-label">Salones Registrados</span>
+        <span class="legend-value">{{ totalSalones }}</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-line green-line"></div>
+      <div class="legend-text">
+        <span class="legend-label">Propietarios</span>
+        <span class="legend-value">{{ totalPropietarios }}</span>
+      </div>
+    </div>
+  </div>
+</div>

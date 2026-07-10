@@ -1,0 +1,50 @@
+<div class="card">
+  <div class="card-header">
+    <div class="title-container">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="warning-icon">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <h3 class="card-title">Propietarios con Deuda Vencida</h3>
+    </div>
+    <button class="btn-outline">Ver todos</button>
+  </div>
+
+  <div class="card-body">
+    @for (debtor of debtors; track debtor.email) {
+    <div class="debt-item" style="margin-bottom: 12px;">
+      <div class="item-header">
+        <div class="owner-info">
+          <div class="owner-name">{{ debtor.hostName }}</div>
+          <div class="owner-email">{{ debtor.email }}</div>
+        </div>
+        <div class="status-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          {{ debtor.delayDays }} días vencido
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div>Salones: <strong>{{ debtor.venuesCount }}</strong></div>
+        <div>Ingresos: <strong>S/ {{ debtor.totalIncome | number:'1.2-2' }}</strong></div>
+      </div>
+
+      <div class="comision-row">
+        <div class="comision-label">Comisión pendiente:</div>
+        <div class="comision-value">S/ {{ debtor.pendingCommission | number:'1.2-2' }}</div>
+      </div>
+    </div>
+    } @empty {
+    <div style="text-align: center; color: #6b7280; padding: 20px 0;">
+      No hay propietarios con deuda vencida.
+    </div>
+    }
+  </div>
+</div>
