@@ -1,0 +1,26 @@
+<div style="padding: 24px;">
+  <app-dashboard-stats></app-dashboard-stats>
+
+  <div style="display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap;">
+    <div style="flex: 2; min-width: 400px;">
+      <app-evolucion-comisiones></app-evolucion-comisiones>
+    </div>
+    <div style="flex: 1; min-width: 300px;">
+      <app-distribucion-deporte></app-distribucion-deporte>
+    </div>
+  </div>
+
+  <app-top-salones [rawData]="bookingsData"></app-top-salones>
+  <div style="display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 300px;">
+      <app-top-reservadas></app-top-reservadas>
+    </div>
+    <div style="flex: 1; min-width: 300px;">
+      <app-deuda-vencida></app-deuda-vencida>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px;">
+    <app-crecimiento-plataforma></app-crecimiento-plataforma>
+  </div>
+</div>

@@ -1,0 +1,285 @@
+<div class="propietarios-container">
+  <!-- Header -->
+  <div class="propietarios-header">
+    <h1>Gestión de Propietarios</h1>
+    <p>Administra todos los propietarios registrados en la plataforma</p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <!-- Card 1: Total Propietarios -->
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-blue-light">
+        <svg class="kpi-icon text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Total Propietarios</span>
+        <span class="kpi-value">{{ totalPropietarios }}</span>
+      </div>
+    </div>
+
+    <!-- Card 2: Activos -->
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-green-light">
+        <svg class="kpi-icon text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Activos</span>
+        <span class="kpi-value">{{ activosCount }}</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Deuda Vencida -->
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-red-light">
+        <svg class="kpi-icon text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Deuda Vencida</span>
+        <span class="kpi-value">{{ deudaVencidaCount }}</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Total Canchas -->
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-purple-light">
+        <svg class="kpi-icon text-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+          <line x1="9" y1="22" x2="9" y2="16"></line>
+          <line x1="9" y1="16" x2="15" y2="16"></line>
+          <line x1="15" y1="16" x2="15" y2="22"></line>
+          <line x1="9" y1="8" x2="9.01" y2="8"></line>
+          <line x1="15" y1="8" x2="15.01" y2="8"></line>
+          <line x1="9" y1="12" x2="9.01" y2="12"></line>
+          <line x1="15" y1="12" x2="15.01" y2="12"></line>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Total Canchas</span>
+        <span class="kpi-value">{{ totalCanchas }}</span>
+      </div>
+    </div>
+
+    <!-- Card 5: Ingresos Total -->
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-gold-light">
+        <svg class="kpi-icon text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Ingresos Total</span>
+        <span class="kpi-value">S/. {{ totalIncome | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="controls-bar">
+    <div class="search-wrapper">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input 
+        type="text" 
+        placeholder="Buscar por nombre o email..." 
+        [(ngModel)]="searchQuery" 
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <div class="filter-tabs">
+      <button [class.active]="activeTab === 'Todos'" (click)="setTab('Todos')">Todos</button>
+      <button [class.active]="activeTab === 'Activos'" (click)="setTab('Activos')">Activos</button>
+      <button [class.active]="activeTab === 'Deuda Vencida'" (click)="setTab('Deuda Vencida')">Deuda Vencida</button>
+      <button [class.active]="activeTab === 'Eliminados'" (click)="setTab('Eliminados')">Eliminados</button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (errorMessage) {
+    <div class="error-banner">
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando datos de propietarios...</p>
+    </div>
+  } @else {
+    <!-- Grid Table -->
+    <div class="table-container shadow-sm">
+      <table class="propietarios-table">
+        <thead>
+          <tr>
+            <th>Propietario</th>
+            <th>Contacto</th>
+            <th>Canchas</th>
+            <th>Ingresos</th>
+            <th>Comisión</th>
+            <th>Estado</th>
+            <th>Último pago</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (host of pagedHosts; track host.hostId) {
+            <tr>
+              <!-- Propietario -->
+              <td>
+                <div class="owner-cell">
+                  <span class="owner-name">{{ host.hostName }}</span>
+                  <span class="owner-reg-date">Registrado: {{ formatDate(host.registrationDate) }}</span>
+                </div>
+              </td>
+              <!-- Contacto -->
+              <td>
+                <div class="contact-cell">
+                  <div class="contact-item">
+                    <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                      <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <span class="contact-text">{{ host.email }}</span>
+                  </div>
+                  <div class="contact-item">
+                    <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    <span class="contact-text">{{ host.phone || '-' }}</span>
+                  </div>
+                </div>
+              </td>
+              <!-- Canchas -->
+              <td>
+                <div class="venues-cell">
+                  <svg class="venues-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                    <line x1="9" y1="22" x2="9" y2="16"></line>
+                    <line x1="9" y1="16" x2="15" y2="16"></line>
+                    <line x1="15" y1="16" x2="15" y2="22"></line>
+                  </svg>
+                  <div class="venues-info">
+                    <span class="venues-count">{{ host.venuesCount || 0 }}</span>
+                    <span class="venues-label">canchas</span>
+                  </div>
+                </div>
+              </td>
+              <!-- Ingresos -->
+              <td>
+                <div class="income-cell">
+                  <span class="income-amount">S/. {{ (host.totalIncomeLastPeriod || 0) | number:'1.2-2' }}</span>
+                </div>
+              </td>
+              <!-- Comisión -->
+              <td>
+                <div class="commission-cell">
+                  <span class="commission-amount">S/. {{ (host.commissionLastPeriod || 0) | number:'1.2-2' }}</span>
+                </div>
+              </td>
+              <!-- Estado -->
+              <td>
+                <span class="status-badge" [class]="getStatusBadgeClass(host.statusLastPeriod)">
+                  {{ getStatusLabel(host.statusLastPeriod) }}
+                </span>
+              </td>
+              <!-- Último pago -->
+              <td>
+                <span class="last-payment-date">{{ formatDate(host.deadlineLastPeriod) }}</span>
+              </td>
+              <!-- Acciones -->
+              <td class="text-right">
+                <button class="btn-action">
+                  <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <span>Ver detalles</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="empty-cell">
+                <div class="empty-state">
+                  <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <p>No se encontraron propietarios que coincidan con la búsqueda o el filtro.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- Pagination Footer -->
+      @if (filteredHosts.length > 0) {
+        <div class="table-pagination">
+          <div class="pagination-controls">
+            <!-- First Page -->
+            <button 
+              class="pag-btn" 
+              [disabled]="currentPage === 1" 
+              (click)="goToPage(1)"
+              title="Primera página"
+            >
+              &lt;&lt;
+            </button>
+            <!-- Previous Page -->
+            <button 
+              class="pag-btn" 
+              [disabled]="currentPage === 1" 
+              (click)="goToPage(currentPage - 1)"
+              title="Página anterior"
+            >
+              &lt;
+            </button>
+
+            <!-- Page Number -->
+            <span class="pag-current-page">{{ currentPage }}</span>
+
+            <!-- Next Page -->
+            <button 
+              class="pag-btn" 
+              [disabled]="currentPage === totalPages" 
+              (click)="goToPage(currentPage + 1)"
+              title="Página siguiente"
+            >
+              &gt;
+            </button>
+            <!-- Last Page -->
+            <button 
+              class="pag-btn" 
+              [disabled]="currentPage === totalPages" 
+              (click)="goToPage(totalPages)"
+              title="Última página"
+            >
+              &gt;&gt;
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
