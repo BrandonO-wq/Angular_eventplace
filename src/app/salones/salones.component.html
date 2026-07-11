@@ -1,0 +1,187 @@
+<div class="salones-container">
+  <!-- Header -->
+  <div class="salones-header">
+    <div class="header-content">
+      <h1>Gestión de Salones</h1>
+      <p>Administración de todos los salones de la plataforma</p>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-blue-light">
+        <svg class="kpi-icon text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Total Salones</span>
+        <span class="kpi-value">{{ totalSalones }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-green-light">
+        <svg class="kpi-icon text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Activas</span>
+        <span class="kpi-value">{{ activosCount }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-purple-light">
+        <svg class="kpi-icon text-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Reservas</span>
+        <span class="kpi-value">{{ reservasCount }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-green-light">
+        <svg class="kpi-icon text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Comisiones</span>
+        <span class="kpi-value">S/ {{ totalComisiones | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper bg-gold-light">
+        <svg class="kpi-icon text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Rating</span>
+        <span class="kpi-value">{{ avgRating | number:'1.1-1' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" placeholder="Buscar salón, dueño o ubicación..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
+    </div>
+    <select class="filter-select">
+      <option value="">Todos los eventos</option>
+      <option value="bodas">Bodas</option>
+      <option value="corporativo">Corporativo</option>
+      <option value="cumpleanos">Cumpleaños</option>
+      <option value="social">Social</option>
+    </select>
+    <select class="filter-select">
+      <option value="">Todos los estados...</option>
+    </select>
+    <select class="filter-select">
+      <option value="">Mayor calificación...</option>
+    </select>
+  </div>
+
+  @if (errorMessage) {
+    <div class="error-banner" style="background-color: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 24px;">
+      <span>{{ errorMessage }}</span>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="loading-state" style="text-align: center; padding: 40px; color: #6b7280;">
+      <p>Cargando datos de salones...</p>
+    </div>
+  } @else {
+    <!-- List Items -->
+    <div class="salones-list">
+      @for (salon of filteredSalones; track salon.id) {
+        <div class="salon-card">
+          <div class="salon-card-header">
+            <div class="salon-title-info">
+              <h2>{{ salon.name }}</h2>
+              <div class="salon-meta">
+                <span class="meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  {{ salon.ownerName }}
+                </span>
+                <span class="meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                  {{ salon.address }}
+                </span>
+              </div>
+            </div>
+            <div class="salon-tags">
+              <span class="tag tag-gray">Eventos</span>
+              <span class="tag tag-green">Activo</span>
+            </div>
+          </div>
+
+          <div class="salon-stats-grid">
+            <div class="stat-box bg-gold-lightest">
+              <div class="stat-value text-gold">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                {{ salon.reviewsAverage | number:'1.1-1' }}
+              </div>
+              <div class="stat-label">{{ salon.reviewsCount }} reseñas</div>
+            </div>
+            <div class="stat-box bg-blue-lightest">
+              <div class="stat-value text-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                {{ salon.bookingsCount }}
+              </div>
+              <div class="stat-label">{{ salon.bookingsLastMonthCount }} este mes</div>
+            </div>
+            <div class="stat-box bg-green-lightest">
+              <div class="stat-value text-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                S/ {{ salon.incomeLastPeriod | number:'1.2-2' }}
+              </div>
+              <div class="stat-label">Ingresos totales</div>
+            </div>
+            <div class="stat-box bg-purple-lightest">
+              <div class="stat-value text-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                S/ {{ salon.commissionLastPeriod | number:'1.2-2' }}
+              </div>
+              <div class="stat-label">Comisión</div>
+            </div>
+          </div>
+
+          <div class="salon-card-footer">
+            <span class="register-date">ID: {{ salon.id.split('-')[0] }}</span>
+            <button class="btn-owner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              Ver dueño
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state" style="text-align: center; padding: 40px; color: #6b7280; background: white; border-radius: 12px;">
+          <p>No se encontraron salones.</p>
+        </div>
+      }
+    </div>
+    
+    @if (filteredSalones.length > 0) {
+      <div class="pagination">
+        <button class="page-nav" disabled>&laquo;</button>
+        <button class="page-nav" disabled>&lsaquo;</button>
+        <button class="page-num active">1</button>
+        <button class="page-nav" disabled>&rsaquo;</button>
+        <button class="page-nav" disabled>&raquo;</button>
+      </div>
+    }
+  }
+</div>
