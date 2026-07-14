@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BarrasuperiorComponent } from './barrasuperior.component';
 
+import { RouterLink, RouterLinkActive } from '@angular/router';
+
 describe('BarrasuperiorComponent', () => {
   let component: BarrasuperiorComponent;
   let fixture: ComponentFixture<BarrasuperiorComponent>;
@@ -10,7 +12,7 @@ describe('BarrasuperiorComponent', () => {
     await TestBed.configureTestingModule({
       imports: [BarrasuperiorComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(BarrasuperiorComponent);
     component = fixture.componentInstance;

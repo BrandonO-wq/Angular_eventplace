@@ -316,3 +316,439 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== OWNER MODAL STYLES ===== */
+.owner-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.owner-modal-container {
+  background: white;
+  width: 100%;
+  max-width: 950px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: modalEnter 0.3s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.owner-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.owner-modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.close-modal-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-modal-btn:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.owner-modal-loading {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f4f6;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.owner-modal-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.owner-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.owner-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.owner-status-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-debt-overdue {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.status-debt-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.status-debt-clear {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.owner-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.owner-card {
+  background-color: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.owner-card h3 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-col {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  word-break: break-all;
+}
+
+.stat-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.stat-row-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stat-label-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.stat-number-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.text-green {
+  color: #059669 !important;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.debt-card {
+  background-color: #fafafa;
+}
+
+.debt-card.has-debt {
+  background-color: #fffafb;
+  border-color: #fee2e2;
+}
+
+.debt-amount-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+  text-align: left;
+}
+
+.debt-card.has-debt .debt-amount-section {
+  background-color: #fff5f5;
+  border-color: #fecaca;
+}
+
+.debt-amount-label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.debt-amount-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.debt-amount-value.text-red {
+  color: #dc2626;
+}
+
+.debt-deadline-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.deadline-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+.delay-days-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.no-debt-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #059669;
+  line-height: 1.4;
+}
+
+.btn-reminder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin-top: auto;
+}
+
+.btn-reminder:hover {
+  background-color: #dc2626;
+}
+
+.canchas-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.canchas-section h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.canchas-table-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.canchas-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.canchas-table th {
+  background-color: #f9fafb;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.canchas-table td {
+  padding: 12px 16px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.canchas-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.venue-name-cell {
+  font-weight: 600;
+  color: #111827;
+}
+
+.sport-badge {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+.rating-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.earnings-cell {
+  font-weight: 600;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.status-pill.status-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.no-venues-cell {
+  text-align: center;
+  padding: 24px;
+  color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .owner-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .owner-modal-container {
+    max-height: 95vh;
+  }
+}
+

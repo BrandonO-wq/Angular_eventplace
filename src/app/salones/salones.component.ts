@@ -41,10 +41,115 @@ export class SalonesComponent implements OnInit {
   loading = false;
   errorMessage = '';
 
+  // Owner details modal state
+  showOwnerModal = false;
+  selectedOwnerDetails: any = null;
+  selectedOwnerVenues: any[] = [];
+  loadingOwnerDetails = false;
+  totalEarningsSum = 0;
+  registeredHosts: any[] = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.fetchSalones();
+    this.fetchRegisteredHosts();
+  }
+
+  fetchRegisteredHosts(): void {
+    let token = '';
+    if (typeof localStorage !== 'undefined') {
+      token = localStorage.getItem('accessToken') || '';
+    }
+    this.http.get<any[]>(`${environment.apiUrl}/host-debts/registered-hosts`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': '69420'
+      }
+    }).subscribe({
+      next: (hosts) => {
+        this.registeredHosts = hosts || [];
+      },
+      error: (err) => {
+        console.error('Error fetching registered hosts:', err);
+      }
+    });
+  }
+
+  openOwnerModal(salon: VenueReportBooking): void {
+    let hostId = (salon as any).hostId || (salon as any).ownerId;
+    if (!hostId && salon.ownerName) {
+      const found = this.registeredHosts.find(
+        h => h.hostName.toLowerCase() === salon.ownerName.toLowerCase()
+      );
+      if (found) {
+        hostId = found.hostId;
+      }
+    }
+
+    if (!hostId) {
+      alert('No se pudo encontrar el ID del dueño de este salón.');
+      return;
+    }
+
+    this.showOwnerModal = true;
+    this.loadingOwnerDetails = true;
+    this.selectedOwnerDetails = null;
+    this.selectedOwnerVenues = [];
+    this.totalEarningsSum = 0;
+
+    let token = '';
+    if (typeof localStorage !== 'undefined') {
+      token = localStorage.getItem('accessToken') || '';
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'ngrok-skip-browser-warning': '69420'
+    };
+
+    // Fetch host details
+    this.http.get<any>(`${environment.apiUrl}/host-detail/${hostId}`, { headers }).subscribe({
+      next: (details) => {
+        this.selectedOwnerDetails = details;
+        this.checkLoadingState();
+      },
+      error: (err) => {
+        console.error('Error fetching host details:', err);
+        this.loadingOwnerDetails = false;
+        alert('No se pudieron cargar los detalles del dueño.');
+      }
+    });
+
+    // Fetch host venues
+    this.http.get<any[]>(`${environment.apiUrl}/venues/host/${hostId}`, { headers }).subscribe({
+      next: (venues) => {
+        this.selectedOwnerVenues = venues || [];
+        this.totalEarningsSum = this.selectedOwnerVenues.reduce((sum, v) => sum + (v.totalEarnings || 0), 0);
+        this.checkLoadingState();
+      },
+      error: (err) => {
+        console.error('Error fetching host venues:', err);
+        this.loadingOwnerDetails = false;
+        alert('No se pudieron cargar las canchas del dueño.');
+      }
+    });
+  }
+
+  checkLoadingState(): void {
+    if (this.selectedOwnerDetails && this.selectedOwnerVenues) {
+      this.loadingOwnerDetails = false;
+    }
+  }
+
+  closeOwnerModal(): void {
+    this.showOwnerModal = false;
+    this.selectedOwnerDetails = null;
+    this.selectedOwnerVenues = [];
+  }
+
+  sendReminder(): void {
+    alert(`Recordatorio enviado con éxito a ${this.selectedOwnerDetails?.name}`);
   }
 
   fetchSalones(): void {
