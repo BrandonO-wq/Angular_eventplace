@@ -38,6 +38,10 @@ export class SalonesComponent implements OnInit {
   avgRating = 0;
 
   searchQuery = '';
+  eventTypeFilter = '';
+  stateFilter = '';
+  sortFilter = '';
+  
   loading = false;
   errorMessage = '';
 
@@ -183,8 +187,7 @@ export class SalonesComponent implements OnInit {
           }
 
           this.salones = dataArray || [];
-          this.filteredSalones = dataArray || [];
-          this.calculateKPIs();
+          this.applyFilters();
         } catch (e) {
           console.error('Error al procesar los datos:', e);
           this.errorMessage = 'Hubo un error al procesar la respuesta del servidor.';
@@ -214,17 +217,58 @@ export class SalonesComponent implements OnInit {
     }
   }
 
-  onSearchChange(): void {
-    if (!this.searchQuery || this.searchQuery.trim() === '') {
-      this.filteredSalones = this.salones;
-    } else {
+  applyFilters(): void {
+    let result = [...this.salones];
+
+    // Búsqueda por texto
+    if (this.searchQuery && this.searchQuery.trim() !== '') {
       const query = this.searchQuery.toLowerCase().trim();
-      this.filteredSalones = this.salones.filter(s => 
+      result = result.filter(s => 
         (s.name && s.name.toLowerCase().includes(query)) ||
         (s.ownerName && s.ownerName.toLowerCase().includes(query)) ||
         (s.address && s.address.toLowerCase().includes(query))
       );
     }
+
+    // Filtro por tipo de evento
+    if (this.eventTypeFilter) {
+      result = result.filter(s => {
+        const types = (s as any).eventTypes || [];
+        return types.some((t: string) => t.toLowerCase() === this.eventTypeFilter.toLowerCase());
+      });
+    }
+
+    // Filtro por estado
+    if (this.stateFilter) {
+      if (this.stateFilter === 'activos') {
+        result = result.filter(s => {
+          const isActive = (s as any).active === true || (s as any).status === 'ACTIVO' || (s as any).estado === 'ACTIVO' || (s as any).estado === 'Activo';
+          return isActive || ((s as any).active === undefined && (s as any).status === undefined && (s as any).estado === undefined); // Asumimos activo por defecto si no hay prop
+        });
+      } else if (this.stateFilter === 'inactivos') {
+        result = result.filter(s => (s as any).active === false || (s as any).status === 'INACTIVO' || (s as any).estado === 'INACTIVO' || (s as any).estado === 'Inactivo');
+      } else if (this.stateFilter === 'eliminados') {
+        result = result.filter(s => (s as any).status === 'ELIMINADO' || (s as any).estado === 'ELIMINADO');
+      }
+    }
+
+    // Filtro por ordenamiento
+    if (this.sortFilter === 'menor_calificacion') {
+      result.sort((a, b) => (a.reviewsAverage || 0) - (b.reviewsAverage || 0));
+    } else if (this.sortFilter === 'sin_calificacion') {
+      result = result.filter(s => !s.reviewsAverage || s.reviewsAverage === 0);
+    } else if (this.sortFilter === 'mas_reservas') {
+      result.sort((a, b) => (b.bookingsCount || 0) - (a.bookingsCount || 0));
+    } else if (this.sortFilter === 'menos_reservas') {
+      result.sort((a, b) => (a.bookingsCount || 0) - (b.bookingsCount || 0));
+    } else if (this.sortFilter === 'mayores_ingresos') {
+      result.sort((a, b) => (b.incomeLastPeriod || 0) - (a.incomeLastPeriod || 0));
+    } else {
+      // Por defecto o 'Mayor calificación'
+      result.sort((a, b) => (b.reviewsAverage || 0) - (a.reviewsAverage || 0));
+    }
+
+    this.filteredSalones = result;
     this.calculateKPIs();
   }
 }

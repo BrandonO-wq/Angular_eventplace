@@ -1,3 +1,11 @@
-// Este archivo fue consolidado en top-salones.component.ts
-// No exporta nada para evitar conflictos de selector duplicado.
-export {};
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-top-salones',
+  imports: [],
+  templateUrl: './top-salones.html',
+  styleUrl: './top-salones.css',
+})
+export class TopSalones {
+
+}

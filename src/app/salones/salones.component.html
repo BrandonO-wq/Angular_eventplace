@@ -76,20 +76,28 @@
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" placeholder="Buscar salón, dueño o ubicación..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
+      <input type="text" placeholder="Buscar salón, dueño o ubicación..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
     </div>
-    <select class="filter-select">
+    <select class="filter-select" name="eventType" [(ngModel)]="eventTypeFilter" (change)="applyFilters()">
       <option value="">Todos los eventos</option>
       <option value="bodas">Bodas</option>
       <option value="corporativo">Corporativo</option>
       <option value="cumpleanos">Cumpleaños</option>
       <option value="social">Social</option>
     </select>
-    <select class="filter-select">
-      <option value="">Todos los estados...</option>
+    <select class="filter-select" name="state" [(ngModel)]="stateFilter" (change)="applyFilters()">
+      <option value="">Todos los estados</option>
+      <option value="activos">🟢 Activos</option>
+      <option value="inactivos">🟠 Inactivos</option>
+      <option value="eliminados">🔴 Eliminados</option>
     </select>
-    <select class="filter-select">
-      <option value="">Mayor calificación...</option>
+    <select class="filter-select" name="sort" [(ngModel)]="sortFilter" (change)="applyFilters()">
+      <option value="">⭐ Mayor calificación</option>
+      <option value="menor_calificacion">📉 Menor calificación</option>
+      <option value="sin_calificacion">☆ Sin calificación</option>
+      <option value="mas_reservas">📅 Más Reservas</option>
+      <option value="menos_reservas">🗓️ Menos Reservas</option>
+      <option value="mayores_ingresos">📈 Mayores Ingresos</option>
     </select>
   </div>
 
