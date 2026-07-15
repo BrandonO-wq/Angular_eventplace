@@ -53,6 +53,12 @@ export class SalonesComponent implements OnInit {
   totalEarningsSum = 0;
   registeredHosts: any[] = [];
 
+  // Reminder modal state
+  showReminderModal = false;
+  sendingReminder = false;
+  currentHostId: string | null = null;
+  simulatedPayments: any[] = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -96,6 +102,7 @@ export class SalonesComponent implements OnInit {
       return;
     }
 
+    this.currentHostId = hostId;
     this.showOwnerModal = true;
     this.loadingOwnerDetails = true;
     this.selectedOwnerDetails = null;
@@ -130,6 +137,7 @@ export class SalonesComponent implements OnInit {
       next: (venues) => {
         this.selectedOwnerVenues = venues || [];
         this.totalEarningsSum = this.selectedOwnerVenues.reduce((sum, v) => sum + (v.totalEarnings || 0), 0);
+        this.generateSimulatedPayments();
         this.checkLoadingState();
       },
       error: (err) => {
@@ -138,6 +146,37 @@ export class SalonesComponent implements OnInit {
         alert('No se pudieron cargar las canchas del dueño.');
       }
     });
+  }
+
+  generateSimulatedPayments(): void {
+    const venues = this.selectedOwnerVenues || [];
+    const venueName = venues.length > 0 ? venues[0].name : 'Cancha Huaraz';
+    
+    // Generate 1 realistic payment as shown in screenshot
+    this.simulatedPayments = [
+      {
+        id: 1,
+        date: '18/06/2026 12:41 AM',
+        venue: venueName,
+        docType: 'BOLETA',
+        docNumber: '70983830',
+        amount: 20.00,
+        status: 'Aprobado'
+      }
+    ];
+
+    // Add a second one if they have more venues for variety
+    if (venues.length > 1) {
+      this.simulatedPayments.push({
+        id: 2,
+        date: '10/06/2026 04:15 PM',
+        venue: venues[1].name,
+        docType: 'FACTURA',
+        docNumber: '00192834',
+        amount: 35.50,
+        status: 'Aprobado'
+      });
+    }
   }
 
   checkLoadingState(): void {
@@ -150,10 +189,62 @@ export class SalonesComponent implements OnInit {
     this.showOwnerModal = false;
     this.selectedOwnerDetails = null;
     this.selectedOwnerVenues = [];
+    this.currentHostId = null;
+    this.simulatedPayments = [];
   }
 
   sendReminder(): void {
-    alert(`Recordatorio enviado con éxito a ${this.selectedOwnerDetails?.name}`);
+    this.showReminderModal = true;
+  }
+
+  closeReminderModal(): void {
+    if (!this.sendingReminder) {
+      this.showReminderModal = false;
+    }
+  }
+
+  confirmSendReminder(): void {
+    if (!this.currentHostId || !this.selectedOwnerDetails) {
+      alert('No se pudo determinar la información del propietario.');
+      return;
+    }
+
+    this.sendingReminder = true;
+    
+    let token = '';
+    if (typeof localStorage !== 'undefined') {
+      token = localStorage.getItem('accessToken') || '';
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'ngrok-skip-browser-warning': '69420'
+    };
+
+    const debtAmountFormatted = (this.selectedOwnerDetails.debtAmount || 0).toFixed(2);
+    const delayDays = this.selectedOwnerDetails.delayDays || 0;
+
+    const payload = {
+      title: '⚠️ Deuda Vencida',
+      body: `Tienes una deuda vencida de S/ ${debtAmountFormatted} con ${delayDays} días de retraso. Regulariza tu pago para reactivar tus salones`
+    };
+
+    this.http.post<any>(
+      `${environment.apiUrl}/api/v1/admin/users/${this.currentHostId}/notify-debt`,
+      payload,
+      { headers }
+    ).subscribe({
+      next: (response) => {
+        this.sendingReminder = false;
+        this.showReminderModal = false;
+        alert('Notificación de recordatorio enviada con éxito.');
+      },
+      error: (err) => {
+        console.error('Error sending debt notification:', err);
+        this.sendingReminder = false;
+        alert('Ocurrió un error al enviar la notificación de recordatorio.');
+      }
+    });
   }
 
   fetchSalones(): void {

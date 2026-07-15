@@ -752,3 +752,277 @@
   }
 }
 
+/* ===== REMINDER MODAL STYLES ===== */
+.reminder-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.reminder-modal-container {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  animation: modalEnter 0.25s ease-out;
+  overflow: hidden;
+}
+
+.reminder-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.reminder-modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.reminder-modal-content {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reminder-body-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.reminder-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #374151; /* Dark gray outline */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #374151;
+}
+
+.reminder-icon-wrapper svg {
+  width: 24px;
+  height: 24px;
+}
+
+.reminder-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.reminder-question {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.reminder-question strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.reminder-explanation {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.reminder-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.reminder-modal-actions .btn-cancel {
+  background-color: #6366f1; /* Indigo */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reminder-modal-actions .btn-cancel:hover {
+  background-color: #4f46e5;
+}
+
+.reminder-modal-actions .btn-cancel:disabled {
+  background-color: #a5b4fc;
+  cursor: not-allowed;
+}
+
+.reminder-modal-actions .btn-confirm {
+  background-color: #ef4444; /* Red */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reminder-modal-actions .btn-confirm:hover {
+  background-color: #dc2626;
+}
+
+.reminder-modal-actions .btn-confirm:disabled {
+  background-color: #fca5a5;
+  cursor: not-allowed;
+}
+
+/* Spinner small */
+.spinner-small {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+/* ===== HISTORIAL DE PAGOS STYLES ===== */
+.payments-section {
+  margin-top: 24px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 24px;
+}
+
+.payments-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.payments-table-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.payments-table th {
+  background-color: #f9fafb;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.payments-table td {
+  padding: 12px 16px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.payments-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.payment-venue-cell {
+  font-weight: 600;
+  color: #111827;
+}
+
+.payment-amount-cell {
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.status-pill.status-approved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.no-payments-cell {
+  text-align: center;
+  padding: 24px;
+  color: #9ca3af;
+}
+
+/* Pagination */
+.simple-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pag-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pag-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.pag-btn:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.pag-btn.active {
+  background-color: #eff6ff;
+  color: #1e40af;
+  font-weight: 700;
+}
+
+
+

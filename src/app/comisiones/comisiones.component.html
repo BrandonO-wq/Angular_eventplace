@@ -1,0 +1,219 @@
+<div class="comisiones-container">
+
+  <!-- Header -->
+  <div class="comisiones-header">
+    <div class="header-left">
+      <h1>Gestión de Comisiones (4%)</h1>
+      <p>
+        Control de pagos de comisiones de propietarios 
+        <span class="badge-pasarela">Pasarela: 2.90%</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading & Error states -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando datos de comisiones...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="error-state">
+      <p>{{ errorMessage }}</p>
+    </div>
+  } @else {
+    <!-- KPI Cards Grid -->
+    <div class="kpi-grid">
+      
+      <!-- Pendientes Card -->
+      <div class="kpi-card kpi-pendientes">
+        <div class="kpi-icon-wrapper bg-yellow-light">
+          <svg class="kpi-icon text-yellow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Pendientes</span>
+          <span class="kpi-value value-yellow">S/ {{ pendientesMonto | number:'1.2-2' }}</span>
+          <span class="kpi-subtext">{{ pendientesCanchas }} canchas</span>
+        </div>
+      </div>
+
+      <!-- Vencidas Card -->
+      <div class="kpi-card kpi-vencidas">
+        <div class="kpi-icon-wrapper bg-red-light">
+          <svg class="kpi-icon text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Vencidas</span>
+          <span class="kpi-value value-red">S/ {{ vencidasMonto | number:'1.2-2' }}</span>
+          <span class="kpi-subtext">{{ vencidasCanchas }} canchas</span>
+        </div>
+      </div>
+
+      <!-- Cobradas Card -->
+      <div class="kpi-card kpi-cobradas">
+        <div class="kpi-icon-wrapper bg-green-light">
+          <svg class="kpi-icon text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Cobradas</span>
+          <span class="kpi-value value-green">S/ {{ cobradasMonto | number:'1.2-2' }}</span>
+          <span class="kpi-subtext">{{ cobradasCanchas }} canchas</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Weekly Verification Process Block -->
+    <div class="process-block">
+      
+      <!-- Block Header -->
+      <div class="process-header">
+        <div class="process-title-group">
+          <div class="calendar-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div>
+            <h2>Proceso de Verificación Semanal</h2>
+            <p>Flujo automatizado de control de comisiones</p>
+          </div>
+        </div>
+        <div class="date-badge">
+          {{ todayStr }}
+        </div>
+      </div>
+
+      <!-- Detail Cards (Payment Deadline & Amount Review) -->
+      <div class="detail-cards-grid">
+        
+        <!-- Payment Deadline Card -->
+        <div class="detail-card border-red">
+          <div class="card-top">
+            <div class="card-left-info">
+              <div class="icon-circle border-red text-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <div class="text-group">
+                <h3>Límite de Pago</h3>
+                <span class="sub">Todos los Domingo</span>
+              </div>
+            </div>
+            <div class="card-right-info">
+              <span class="label">Próximo límite:</span>
+              <span class="date text-red">{{ nextSundayStr }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li>
+                <span class="bullet-dot bg-red"></span>
+                Si pasan del domingo sin pagar: deuda vencida
+              </li>
+              <li>
+                <span class="bullet-dot bg-red"></span>
+                Cancha inhabilitada automáticamente
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Amount Review Card -->
+        <div class="detail-card border-blue">
+          <div class="card-top">
+            <div class="card-left-info">
+              <div class="icon-circle border-blue text-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div class="text-group">
+                <h3>Revisión de Montos</h3>
+                <span class="sub">Todos los Lunes</span>
+              </div>
+            </div>
+            <div class="card-right-info">
+              <span class="label">Próxima revisión:</span>
+              <span class="date text-blue">{{ nextMondayStr }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li>
+                <span class="bullet-dot bg-blue"></span>
+                Verificar pagos de la semana
+              </li>
+              <li>
+                <span class="bullet-dot bg-blue"></span>
+                Enviar recordatorios a pendientes
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Process Flow Timeline -->
+      <div class="flow-section">
+        <div class="flow-header">
+          <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
+          </svg>
+          <span>Flujo del proceso:</span>
+        </div>
+        <div class="timeline-steps">
+          
+          <div class="step-pill step-blue">
+            <span>1. Revisión (Lunes)</span>
+          </div>
+          <div class="step-arrow">→</div>
+
+          <div class="step-pill step-yellow">
+            <span>2. Verificar deuda</span>
+          </div>
+          <div class="step-arrow">→</div>
+
+          <div class="step-pill step-red">
+            <span>3. Límite (Domingo)</span>
+          </div>
+          <div class="step-arrow">→</div>
+
+          <div class="step-pill step-gray">
+            <span>4. Inhabilitar automáticamente</span>
+          </div>
+          <div class="step-arrow">→</div>
+
+          <div class="step-pill step-orange">
+            <span>5. Notificar</span>
+          </div>
+          <div class="step-arrow">→</div>
+
+          <div class="step-pill step-green">
+            <span>6. Pago & Rehabilitar</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

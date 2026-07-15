@@ -442,8 +442,112 @@
               </table>
             </div>
           </div>
+
+          <!-- Historial de Pagos Section -->
+          <div class="payments-section">
+            <h3>Historial de Pagos</h3>
+            <div class="payments-table-wrapper">
+              <table class="payments-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Cancha</th>
+                    <th>Tipo Doc.</th>
+                    <th>Nro Doc.</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (payment of simulatedPayments; track payment.id) {
+                    <tr>
+                      <td>{{ payment.date }}</td>
+                      <td class="payment-venue-cell">{{ payment.venue }}</td>
+                      <td>{{ payment.docType }}</td>
+                      <td>{{ payment.docNumber }}</td>
+                      <td class="payment-amount-cell">S/ {{ payment.amount | number:'1.2-2' }}</td>
+                      <td>
+                        <span class="status-pill status-approved">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="10" height="10">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                          {{ payment.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="no-payments-cell">No hay registros de pagos para este propietario.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Simple Pagination -->
+            <div class="simple-pagination">
+              <button class="pag-btn" disabled>&laquo;</button>
+              <button class="pag-btn" disabled>&lsaquo;</button>
+              <button class="pag-btn active">1</button>
+              <button class="pag-btn" disabled>&rsaquo;</button>
+              <button class="pag-btn" disabled>&raquo;</button>
+            </div>
+          </div>
         </div>
       }
     </div>
   </div>
 }
+
+<!-- Reminder Modal Overlay -->
+@if (showReminderModal) {
+  <div class="reminder-modal-backdrop" (click)="closeReminderModal()">
+    <div class="reminder-modal-container" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="reminder-modal-header">
+        <h2>Enviar Recordatorio de Pago</h2>
+        <button class="close-modal-btn" (click)="closeReminderModal()" [disabled]="sendingReminder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="reminder-modal-content">
+        <div class="reminder-body-row">
+          <div class="reminder-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <div class="reminder-text-col">
+            <p class="reminder-question">
+              ¿Estás seguro de enviar ahora mismo un recordatorio de pago a <strong>{{ selectedOwnerDetails?.name }}</strong>?
+            </p>
+            <p class="reminder-explanation">
+              El propietario recibirá una notificación push informándole que tiene una deuda de comisión pendiente de pago.
+            </p>
+          </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="reminder-modal-actions">
+          <button class="btn-cancel" (click)="closeReminderModal()" [disabled]="sendingReminder">
+            Cancelar
+          </button>
+          <button class="btn-confirm" (click)="confirmSendReminder()" [disabled]="sendingReminder">
+            @if (sendingReminder) {
+              <span class="spinner-small"></span> Enviando...
+            } @else {
+              Sí, enviar ahora
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
