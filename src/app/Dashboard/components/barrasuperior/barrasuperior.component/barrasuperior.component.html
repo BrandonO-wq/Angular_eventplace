@@ -3,14 +3,14 @@
     <h1 class="top-bar-title">Administración de Plataforma</h1>
     <p class="top-bar-subtitle">Panel de control del negocio · Gestión de comisiones y métricas</p>
     <div class="banner-actions">
-      <button class="btn-banner">
+      <button class="btn-banner" (click)="openCommissionModal()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="5" x2="5" y2="19"></line>
           <circle cx="6.5" cy="6.5" r="2.5"></circle>
           <circle cx="17.5" cy="17.5" r="2.5"></circle>
         </svg>
-        Configurar Comisión (4%)
+        Configurar Comisión
       </button>
       <button class="btn-banner">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -23,6 +23,7 @@
         Configurar Ciclo Semanal
       </button>
     </div>
+
   </div>
   <div class="banner-top-actions">
     <a routerLink="/propietarios" routerLinkActive="active" class="btn-outline-white">
@@ -45,3 +46,169 @@
     </a>
   </div>
 </header>
+
+<!-- Commission Modal Backdrop -->
+@if (showCommissionModal) {
+  <div class="com-modal-backdrop" (click)="closeCommissionModal()">
+    <div class="com-modal-container" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="com-modal-header">
+        <div class="com-modal-title-row">
+          <span class="com-modal-icon">%</span>
+          <h2>Configurar Porcentaje de Comisión</h2>
+        </div>
+        <button class="com-close-btn" (click)="closeCommissionModal()" [disabled]="loading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="com-modal-content">
+        <p class="com-modal-subtitle">
+          Define el porcentaje de comisión que se cobrará por cada hora de alquiler de canchas en el aplicativo
+        </p>
+
+        <!-- Info Card -->
+        <div class="com-info-card">
+          <span class="com-info-pin">📌</span>
+          <div class="com-info-text-col">
+            <h4 class="com-info-title">Información importante</h4>
+            <p class="com-info-desc">
+              Los propietarios pagarán este porcentaje sobre los ingresos de cada cancha registrada en el aplicativo.
+            </p>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="com-input-section">
+          <label class="com-input-label">Porcentaje de Comisión (%)</label>
+          <div class="com-input-row">
+            <div class="com-input-wrapper">
+              <input type="number" 
+                     class="com-number-input" 
+                     [(ngModel)]="commissionValue" 
+                     min="0" 
+                     max="100" 
+                     step="0.1" 
+                     [disabled]="loading" />
+            </div>
+            <div class="com-preview-value">
+              {{ commissionValue }}%
+            </div>
+          </div>
+          <span class="com-help-text">Ingresa un valor entre 0 y 100</span>
+        </div>
+
+        <!-- Error feedback -->
+        @if (errorMessage) {
+          <div class="com-error-alert">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- Modal Actions -->
+        <div class="com-modal-actions">
+          <button class="com-btn-cancel" (click)="closeCommissionModal()" [disabled]="loading">
+            Cancelar
+          </button>
+          <button class="com-btn-save" (click)="submitCommissionChange()" [disabled]="loading || commissionValue === null || commissionValue < 0 || commissionValue > 100">
+            @if (loading) {
+              <span class="com-spinner"></span> Guardando...
+            } @else {
+              <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              Guardar Configuración
+            }
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- OTP Verification Modal Backdrop -->
+@if (showOtpModal) {
+  <div class="com-modal-backdrop" (click)="closeOtpModal()">
+    <div class="com-modal-container" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="com-modal-header">
+        <div class="com-modal-title-row">
+          <span class="com-modal-icon key-icon">🔑</span>
+          <h2>Confirmar Cambio de Comisión</h2>
+        </div>
+        <button class="com-close-btn" (click)="closeOtpModal()" [disabled]="loading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="com-modal-content">
+        <p class="com-modal-subtitle">
+          Se ha enviado un código de verificación (OTP) para autorizar este cambio. Ingrésalo a continuación para confirmar el nuevo valor de <strong>{{ commissionValue }}%</strong>.
+        </p>
+
+        <!-- Info Card -->
+        <div class="com-info-card otp-card">
+          <span class="com-info-pin">🔐</span>
+          <div class="com-info-text-col">
+            <h4 class="com-info-title">Autorización Requerida</h4>
+            <p class="com-info-desc">
+              Esta acción modificará la tasa de comisión cobrada a los propietarios.
+            </p>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="com-input-section">
+          <label class="com-input-label">Código OTP</label>
+          <input type="text" 
+                 class="com-text-input" 
+                 placeholder="Ingresa el código OTP" 
+                 [(ngModel)]="otpValue" 
+                 [disabled]="loading" />
+        </div>
+
+        <!-- Error/Success feedback -->
+        @if (errorMessage) {
+          <div class="com-error-alert">
+            {{ errorMessage }}
+          </div>
+        }
+        @if (successMessage) {
+          <div class="com-success-alert">
+            {{ successMessage }}
+          </div>
+        }
+
+        <!-- Modal Actions -->
+        <div class="com-modal-actions">
+          <button class="com-btn-cancel" (click)="closeOtpModal()" [disabled]="loading">
+            Cancelar
+          </button>
+          <button class="com-btn-save" (click)="confirmOtp()" [disabled]="loading || !otpValue">
+            @if (loading) {
+              <span class="com-spinner"></span> Confirmando...
+            } @else {
+              <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Confirmar Cambio
+            }
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

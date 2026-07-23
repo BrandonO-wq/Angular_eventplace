@@ -3,9 +3,9 @@
   <!-- Header -->
   <div class="comisiones-header">
     <div class="header-left">
-      <h1>Gestión de Comisiones (4%)</h1>
+      <h1>Gestión de Comisiones ({{ commissionPercentage }}%)</h1>
       <p>
-        Control de pagos de comisiones de propietarios 
+        Control de pagos de comisiones de propietarios
         <span class="badge-pasarela">Pasarela: 2.90%</span>
       </p>
     </div>
@@ -13,207 +13,414 @@
 
   <!-- Loading & Error states -->
   @if (loading) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando datos de comisiones...</p>
-    </div>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando datos de comisiones...</p>
+  </div>
   } @else if (errorMessage) {
-    <div class="error-state">
-      <p>{{ errorMessage }}</p>
-    </div>
+  <div class="error-state">
+    <p>{{ errorMessage }}</p>
+  </div>
   } @else {
-    <!-- KPI Cards Grid -->
-    <div class="kpi-grid">
-      
-      <!-- Pendientes Card -->
-      <div class="kpi-card kpi-pendientes">
-        <div class="kpi-icon-wrapper bg-yellow-light">
-          <svg class="kpi-icon text-yellow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
+  <!-- KPI Cards Grid -->
+  <div class="kpi-grid">
+
+    <!-- Pendientes Card -->
+    <div class="kpi-card kpi-pendientes">
+      <div class="kpi-icon-wrapper bg-yellow-light">
+        <svg class="kpi-icon text-yellow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Pendientes</span>
+        <span class="kpi-value value-yellow">S/ {{ pendientesMonto | number:'1.2-2' }}</span>
+        <span class="kpi-subtext">{{ pendientesCanchas }} Salones </span>
+      </div>
+    </div>
+
+    <!-- Vencidas Card -->
+    <div class="kpi-card kpi-vencidas">
+      <div class="kpi-icon-wrapper bg-red-light">
+        <svg class="kpi-icon text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Vencidas</span>
+        <span class="kpi-value value-red">S/ {{ vencidasMonto | number:'1.2-2' }}</span>
+        <span class="kpi-subtext">{{ vencidasCanchas }} salones</span>
+      </div>
+    </div>
+
+    <!-- Cobradas Card -->
+    <div class="kpi-card kpi-cobradas">
+      <div class="kpi-icon-wrapper bg-green-light">
+        <svg class="kpi-icon text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <span class="kpi-label">Cobradas</span>
+        <span class="kpi-value value-green">S/ {{ cobradasMonto | number:'1.2-2' }}</span>
+        <span class="kpi-subtext">{{ cobradasCanchas }} salones</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Weekly Verification Process Block -->
+  <div class="process-block">
+
+    <!-- Block Header -->
+    <div class="process-header">
+      <div class="process-title-group">
+        <div class="calendar-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
         </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Pendientes</span>
-          <span class="kpi-value value-yellow">S/ {{ pendientesMonto | number:'1.2-2' }}</span>
-          <span class="kpi-subtext">{{ pendientesCanchas }} canchas</span>
+        <div>
+          <h2>Proceso de Verificación Semanal</h2>
+          <p>Flujo automatizado de control de comisiones</p>
+        </div>
+      </div>
+      <div class="date-badge">
+        {{ todayStr }}
+      </div>
+    </div>
+
+    <!-- Detail Cards (Payment Deadline & Amount Review) -->
+    <div class="detail-cards-grid">
+
+      <!-- Payment Deadline Card -->
+      <div class="detail-card border-red">
+        <div class="card-top">
+          <div class="card-left-info">
+            <div class="icon-circle border-red text-red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                </path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="text-group">
+              <h3>Límite de Pago</h3>
+              <span class="sub">Todos los Domingo</span>
+            </div>
+          </div>
+          <div class="card-right-info">
+            <span class="label">Próximo límite:</span>
+            <span class="date text-red">{{ nextSundayStr }}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>
+              <span class="bullet-dot bg-red"></span>
+              Si pasan del domingo sin pagar: deuda vencida
+            </li>
+            <li>
+              <span class="bullet-dot bg-red"></span>
+              Salón inhabilitado automáticamente
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- Vencidas Card -->
-      <div class="kpi-card kpi-vencidas">
-        <div class="kpi-icon-wrapper bg-red-light">
-          <svg class="kpi-icon text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
+      <!-- Amount Review Card -->
+      <div class="detail-card border-blue">
+        <div class="card-top">
+          <div class="card-left-info">
+            <div class="icon-circle border-blue text-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="text-group">
+              <h3>Revisión de Montos</h3>
+              <span class="sub">Todos los Lunes</span>
+            </div>
+          </div>
+          <div class="card-right-info">
+            <span class="label">Próxima revisión:</span>
+            <span class="date text-blue">{{ nextMondayStr }}</span>
+          </div>
         </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Vencidas</span>
-          <span class="kpi-value value-red">S/ {{ vencidasMonto | number:'1.2-2' }}</span>
-          <span class="kpi-subtext">{{ vencidasCanchas }} canchas</span>
-        </div>
-      </div>
-
-      <!-- Cobradas Card -->
-      <div class="kpi-card kpi-cobradas">
-        <div class="kpi-icon-wrapper bg-green-light">
-          <svg class="kpi-icon text-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-        </div>
-        <div class="kpi-info">
-          <span class="kpi-label">Cobradas</span>
-          <span class="kpi-value value-green">S/ {{ cobradasMonto | number:'1.2-2' }}</span>
-          <span class="kpi-subtext">{{ cobradasCanchas }} canchas</span>
+        <div class="card-body">
+          <ul>
+            <li>
+              <span class="bullet-dot bg-blue"></span>
+              Verificar pagos de la semana
+            </li>
+            <li>
+              <span class="bullet-dot bg-blue"></span>
+              Enviar recordatorios a pendientes
+            </li>
+          </ul>
         </div>
       </div>
 
     </div>
 
-    <!-- Weekly Verification Process Block -->
-    <div class="process-block">
-      
-      <!-- Block Header -->
-      <div class="process-header">
-        <div class="process-title-group">
-          <div class="calendar-icon-wrapper">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-          </div>
-          <div>
-            <h2>Proceso de Verificación Semanal</h2>
-            <p>Flujo automatizado de control de comisiones</p>
-          </div>
-        </div>
-        <div class="date-badge">
-          {{ todayStr }}
-        </div>
+    <!-- Process Flow Timeline -->
+    <div class="flow-section">
+      <div class="flow-header">
+        <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
+        </svg>
+        <span>Flujo del proceso:</span>
       </div>
+      <div class="timeline-steps">
 
-      <!-- Detail Cards (Payment Deadline & Amount Review) -->
-      <div class="detail-cards-grid">
-        
-        <!-- Payment Deadline Card -->
-        <div class="detail-card border-red">
-          <div class="card-top">
-            <div class="card-left-info">
-              <div class="icon-circle border-red text-red">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                  <line x1="12" y1="9" x2="12" y2="13"></line>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-              </div>
-              <div class="text-group">
-                <h3>Límite de Pago</h3>
-                <span class="sub">Todos los Domingo</span>
-              </div>
-            </div>
-            <div class="card-right-info">
-              <span class="label">Próximo límite:</span>
-              <span class="date text-red">{{ nextSundayStr }}</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <ul>
-              <li>
-                <span class="bullet-dot bg-red"></span>
-                Si pasan del domingo sin pagar: deuda vencida
-              </li>
-              <li>
-                <span class="bullet-dot bg-red"></span>
-                Cancha inhabilitada automáticamente
-              </li>
-            </ul>
-          </div>
+        <div class="step-pill step-blue">
+          <span>1. Revisión (Lunes)</span>
         </div>
+        <div class="step-arrow">→</div>
 
-        <!-- Amount Review Card -->
-        <div class="detail-card border-blue">
-          <div class="card-top">
-            <div class="card-left-info">
-              <div class="icon-circle border-blue text-blue">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-              </div>
-              <div class="text-group">
-                <h3>Revisión de Montos</h3>
-                <span class="sub">Todos los Lunes</span>
-              </div>
-            </div>
-            <div class="card-right-info">
-              <span class="label">Próxima revisión:</span>
-              <span class="date text-blue">{{ nextMondayStr }}</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <ul>
-              <li>
-                <span class="bullet-dot bg-blue"></span>
-                Verificar pagos de la semana
-              </li>
-              <li>
-                <span class="bullet-dot bg-blue"></span>
-                Enviar recordatorios a pendientes
-              </li>
-            </ul>
-          </div>
+        <div class="step-pill step-yellow">
+          <span>2. Verificar deuda</span>
+        </div>
+        <div class="step-arrow">→</div>
+
+        <div class="step-pill step-red">
+          <span>3. Límite (Domingo)</span>
+        </div>
+        <div class="step-arrow">→</div>
+
+        <div class="step-pill step-gray">
+          <span>4. Inhabilitar automáticamente</span>
+        </div>
+        <div class="step-arrow">→</div>
+
+        <div class="step-pill step-orange">
+          <span>5. Notificar</span>
+        </div>
+        <div class="step-arrow">→</div>
+
+        <div class="step-pill step-green">
+          <span>6. Pago & Rehabilitar</span>
         </div>
 
       </div>
-
-      <!-- Process Flow Timeline -->
-      <div class="flow-section">
-        <div class="flow-header">
-          <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
-          </svg>
-          <span>Flujo del proceso:</span>
-        </div>
-        <div class="timeline-steps">
-          
-          <div class="step-pill step-blue">
-            <span>1. Revisión (Lunes)</span>
-          </div>
-          <div class="step-arrow">→</div>
-
-          <div class="step-pill step-yellow">
-            <span>2. Verificar deuda</span>
-          </div>
-          <div class="step-arrow">→</div>
-
-          <div class="step-pill step-red">
-            <span>3. Límite (Domingo)</span>
-          </div>
-          <div class="step-arrow">→</div>
-
-          <div class="step-pill step-gray">
-            <span>4. Inhabilitar automáticamente</span>
-          </div>
-          <div class="step-arrow">→</div>
-
-          <div class="step-pill step-orange">
-            <span>5. Notificar</span>
-          </div>
-          <div class="step-arrow">→</div>
-
-          <div class="step-pill step-green">
-            <span>6. Pago & Rehabilitar</span>
-          </div>
-
-        </div>
-      </div>
-
     </div>
+
+  </div>
+
+  <!-- Venue Debt Report Table Section -->
+  <div class="report-section">
+    <!-- Table Controls: Search & Filters -->
+    <div class="report-controls">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+          height="18">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()"
+          placeholder="Buscar por nombre o email..." />
+      </div>
+      <div class="filter-pills">
+        <button class="pill" [class.active]="activeFilter === 'Todos'" (click)="setFilter('Todos')">Todos</button>
+        <button class="pill" [class.active]="activeFilter === 'Pendiente'"
+          (click)="setFilter('Pendiente')">Pendiente</button>
+        <button class="pill" [class.active]="activeFilter === 'Pagado'" (click)="setFilter('Pagado')">Pagado</button>
+        <button class="pill" [class.active]="activeFilter === 'Vencido'" (click)="setFilter('Vencido')">Vencido</button>
+      </div>
+    </div>
+
+    <!-- Table Wrapper -->
+    <div class="table-responsive">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Cancha</th>
+            <th>Ubicación</th>
+            <th>Calificación</th>
+            <th>Comisión</th>
+            <th>Com. Pasarela (2.90%)</th>
+            <th>Monto Neto</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (report of filteredReports; track report.venueId) {
+          <tr>
+            <!-- Cancha -->
+            <td>
+              <div class="cancha-cell">
+                <span class="cancha-name">{{ report.venueName }}</span>
+                <span class="cancha-owner">Propietario: {{ report.ownerName }}</span>
+
+                @if (report.delayDays > 0 && (report.debtStatus === 'OVERDUE' || report.debtStatus === 'PENDING')) {
+                <span class="delay-tag">{{ report.delayDays }} días de retraso</span>
+                }
+
+                @if (report.debtStatus === 'PAID' || report.debtStatus === 'NONE') {
+                <span class="badge-status enabled-manually">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Habilitada manualmente
+                </span>
+                } @else {
+                <span class="badge-status disabled-manually">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  Inhabilitada automáticamente
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- Ubicación -->
+            <td>
+              <div class="location-cell">
+                <div class="location-ubigeo">
+                  <svg class="pin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    width="14" height="14">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  {{ report.ubigeo }}
+                </div>
+                <span class="location-address">{{ report.address }}</span>
+              </div>
+            </td>
+
+            <!-- Calificación -->
+            <td>
+              <div class="rating-cell">
+                <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                  <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
+                </svg>
+                <span>{{ report.rating | number:'1.1-1' }}</span>
+              </div>
+            </td>
+
+            <!-- Comisión -->
+            <td>
+              <div class="commission-cell">
+                <span class="commission-amount">S/ {{ report.commissionAmount | number:'1.2-2' }}</span>
+                <span class="income-amount">Ingresos: S/ {{ report.totalIncome | number:'1.2-2' }}</span>
+                <span class="deadline-date">
+                  Vence: {{ report.deadline ? (report.deadline | date:'dd/MM/yyyy') : 'N/A' }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Com. Pasarela -->
+            <td>
+              <div class="pasarela-cell">
+                S/ {{ report.pasarelaFee | number:'1.2-2' }}
+              </div>
+            </td>
+
+            <!-- Monto Neto -->
+            <td>
+              <div class="net-cell">
+                S/ {{ report.netAmount | number:'1.2-2' }}
+              </div>
+            </td>
+
+            <!-- Estado -->
+            <td>
+              <div class="status-cell">
+                @if (report.debtStatus === 'OVERDUE') {
+                <span class="status-badge status-vencido">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  Vencido
+                </span>
+                } @else if (report.debtStatus === 'PENDING' || report.debtStatus === 'LEGACY_PENDING') {
+                <span class="status-badge status-pendiente">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Pendiente
+                </span>
+                } @else if (report.debtStatus === 'PAID') {
+                <span class="status-badge status-pagado">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Pagado
+                </span>
+                } @else {
+                <span class="status-badge status-aldia">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Al día
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- Acciones -->
+            <td>
+              <div class="actions-cell">
+                <button class="action-btn" (click)="toggleActionsMenu(report.venueId)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  Ver
+                </button>
+
+                @if (expandedVenueId === report.venueId) {
+                <div class="actions-menu">
+                  @if (report.debtStatus === 'OVERDUE') {
+                  <button class="menu-btn btn-enable" (click)="toggleVenueStatus(report, true)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
+                      height="12">
+                      <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+                    </svg>
+                    Habilitar
+                  </button>
+                  } @else {
+                  <button class="menu-btn btn-disable" (click)="toggleVenueStatus(report, false)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
+                      height="12">
+                      <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+                    </svg>
+                    Inhabilitar
+                  </button>
+                  }
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="8" class="empty-row">
+              No se encontraron resultados.
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
   }
 
 </div>
