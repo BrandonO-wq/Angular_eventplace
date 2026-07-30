@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { environment } from '../../../Enviroments/Enviroment';
@@ -38,29 +38,51 @@ export class CrecimientoPlataforma implements OnInit {
   xCoords = [50, 160, 270, 380, 490, 600, 690];
   months = ['Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'];
 
-  ngOnInit() {
-    this.updateChart();
+  private _filteredVenues: any[] | null = null;
 
+  @Input() set filteredVenues(list: any[] | null) {
+    this._filteredVenues = list;
+    this.calculateStats();
+  }
+
+  ngOnInit() {
+    this.fetchDefaultStats();
+  }
+
+  fetchDefaultStats() {
     this.http.get<any>(`${this.apiUrl}/venues/report/stats`, {
       headers: {
         'ngrok-skip-browser-warning': '69420'
       }
     }).subscribe({
       next: (data) => {
-        if (data && typeof data.totalSalones === 'number') {
-          this.totalSalones = data.totalSalones;
+        if (!this._filteredVenues) {
+          if (data && typeof data.totalSalones === 'number') {
+            this.totalSalones = data.totalSalones;
+          }
+          if (data && typeof data.totalPropietarios === 'number') {
+            this.totalPropietarios = data.totalPropietarios;
+          }
+          this.updateChart();
         }
-        if (data && typeof data.totalPropietarios === 'number') {
-          this.totalPropietarios = data.totalPropietarios;
-        }
-        this.updateChart();
       },
       error: (err) => {
         console.error('Error fetching platform stats:', err);
-        // Retain default mock values so the chart still displays correctly
-        this.updateChart();
+        if (!this._filteredVenues) {
+          this.updateChart();
+        }
       }
     });
+  }
+
+  calculateStats() {
+    if (this._filteredVenues) {
+      this.totalSalones = this._filteredVenues.length;
+      this.totalPropietarios = new Set(this._filteredVenues.map(v => v.ownerEmail)).size;
+      this.updateChart();
+    } else {
+      this.fetchDefaultStats();
+    }
   }
 
   updateChart() {

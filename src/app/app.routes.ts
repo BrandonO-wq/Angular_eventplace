@@ -5,6 +5,7 @@ import { DashboardComponent } from './Dashboard/pages/dashboard/dashboard.compon
 import { PropietariosComponent } from './propietarios/propietarios.component';
 import { SalonesComponent } from './salones/salones.component';
 import { ComisionesComponent } from './comisiones/comisiones.component';
+import { ReportesComponent } from './reportes/reportes.component';
 import { authGuard } from './Auth/guards/auth.guard';
 
 export const routes: Routes = [
@@ -19,7 +20,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'propietarios', component: PropietariosComponent },
       { path: 'salones', component: SalonesComponent },
-      { path: 'comisiones', component: ComisionesComponent }
+      { path: 'comisiones', component: ComisionesComponent },
+      { path: 'reportes', component: ReportesComponent }
     ]
   },
   { path: '**', redirectTo: '/login' }

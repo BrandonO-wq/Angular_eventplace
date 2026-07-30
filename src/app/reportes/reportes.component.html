@@ -1,0 +1,158 @@
+<div class="reports-container">
+  <!-- Top Banner / Header -->
+  <div class="reports-header-row">
+    <div class="header-left">
+      <h1>Reportes y Análisis</h1>
+      <p class="subtitle">Visualiza métricas detalladas y tendencias del negocio</p>
+    </div>
+    
+    <div class="header-right">
+      <!-- Date Ranges -->
+      <div class="range-selector">
+        <button [class.active]="activeRange === 'semana'" (click)="setDateRange('semana')">Semana</button>
+        <button [class.active]="activeRange === 'mes'" (click)="setDateRange('mes')">Mes</button>
+        <button [class.active]="activeRange === 'trimestre'" (click)="setDateRange('trimestre')">Trimestre</button>
+        <button [class.active]="activeRange === 'ano'" (click)="setDateRange('ano')">Año</button>
+      </div>
+      
+      <!-- Date Range Value & Active Location Badge -->
+      <div class="range-info-badge">
+        <span class="range-dates">{{ dateRangeStr }}</span>
+        @if (selectedLocationName) {
+          <span class="location-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            {{ selectedLocationName }}
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Row -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <!-- Departamento Select -->
+      <div class="filter-group">
+        <label>Departamento</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedDepartamento" (change)="onDepartamentoChange()">
+            <option value="">Seleccione Departamento</option>
+            @for (dept of departamentos; track dept.code) {
+              <option [value]="dept.code">{{ dept.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Provincia Select -->
+      <div class="filter-group">
+        <label>Provincia</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedProvincia" (change)="onProvinciaChange()" [disabled]="!selectedDepartamento">
+            <option value="">Seleccione Provincia</option>
+            @for (prov of provincias; track prov.code) {
+              <option [value]="prov.code">{{ prov.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Distrito Select -->
+      <div class="filter-group">
+        <label>Distrito</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="selectedDistrito" (change)="onDistritoChange()" [disabled]="!selectedProvincia">
+            <option value="">Seleccione Distrito</option>
+            @for (dist of distritos; track dist.code) {
+              <option [value]="dist.code">{{ dist.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Clear Button -->
+      <div class="filter-action-group">
+        <button class="btn-clear" (click)="clearFilters()" [disabled]="!selectedDepartamento && !selectedProvincia && !selectedDistrito">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M22 3H2l8 9v6l4 2v-8L22 3z"></path>
+          </svg>
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Charts & Content -->
+  <div class="reports-content-body">
+    <!-- Stats Row -->
+    <app-dashboard-stats [filteredVenues]="filteredVenues" [filteredBookings]="filteredBookings"></app-dashboard-stats>
+
+    <!-- Main Charts Row -->
+    <div class="charts-grid-row">
+      <div class="chart-col-main">
+        <app-evolucion-comisiones [filteredVenues]="filteredVenues"></app-evolucion-comisiones>
+      </div>
+      <div class="chart-col-side">
+        <app-distribucion-deporte></app-distribucion-deporte>
+      </div>
+    </div>
+
+    <!-- Top Salones table -->
+    <div class="table-container-row">
+      <app-top-salones [rawData]="filteredBookings"></app-top-salones>
+    </div>
+
+    <!-- Secondary Charts Row -->
+    <div class="charts-grid-row mt-24">
+      <div class="chart-col-half">
+        <app-top-reservadas [filteredVenues]="filteredVenues"></app-top-reservadas>
+      </div>
+      <div class="chart-col-half">
+        <app-deuda-vencida [filteredVenues]="filteredVenues"></app-deuda-vencida>
+      </div>
+    </div>
+
+    <!-- Platform Growth Chart -->
+    <div class="growth-container-row mt-24">
+      <app-crecimiento-plataforma [filteredVenues]="filteredVenues"></app-crecimiento-plataforma>
+    </div>
+
+    <!-- Actions Row -->
+    <div class="report-actions-row mt-24">
+      <button class="btn-generate-pdf" (click)="generatePDF()" [disabled]="generatingPdf || generatingExcel">
+        @if (generatingPdf) {
+          <span class="spinner"></span>
+          Generando PDF...
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" class="btn-icon">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Generar PDF de Resumen
+        }
+      </button>
+
+      <button class="btn-generate-excel" (click)="generateExcel()" [disabled]="generatingPdf || generatingExcel">
+        @if (generatingExcel) {
+          <span class="spinner"></span>
+          Generando Excel...
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" class="btn-icon">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <rect x="8" y="12" width="8" height="6" rx="1"></rect>
+            <line x1="8" y1="15" x2="16" y2="15"></line>
+            <line x1="12" y1="12" x2="12" y2="18"></line>
+          </svg>
+          Generar Excel de Resumen
+        }
+      </button>
+    </div>
+  </div>
+</div>

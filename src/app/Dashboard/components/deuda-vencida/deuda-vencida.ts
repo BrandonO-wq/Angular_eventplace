@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef, Input } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../Enviroments/Enviroment';
@@ -12,6 +12,14 @@ import { environment } from '../../../Enviroments/Enviroment';
 })
 export class DeudaVencida implements OnInit {
   debtors: any[] = [];
+
+  private allDebtorsData: any[] = [];
+  private _filteredVenues: any[] | null = null;
+
+  @Input() set filteredVenues(list: any[] | null) {
+    this._filteredVenues = list;
+    this.applyFiltering();
+  }
 
   constructor(
     private http: HttpClient,
@@ -38,12 +46,22 @@ export class DeudaVencida implements OnInit {
       }
     }).subscribe({
       next: (data) => {
-        this.debtors = data;
-        this.cdr.detectChanges();
+        this.allDebtorsData = data;
+        this.applyFiltering();
       },
       error: (err) => {
         console.error('Error fetching debtors:', err);
       }
     });
+  }
+
+  applyFiltering() {
+    let data = [...this.allDebtorsData];
+    if (this._filteredVenues) {
+      const allowedOwnerEmails = new Set(this._filteredVenues.map(v => v.ownerEmail));
+      data = data.filter(d => allowedOwnerEmails.has(d.email));
+    }
+    this.debtors = data;
+    this.cdr.detectChanges();
   }
 }

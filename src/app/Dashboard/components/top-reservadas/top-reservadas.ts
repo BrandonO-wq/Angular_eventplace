@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef, Input } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../Enviroments/Enviroment';
@@ -20,6 +20,14 @@ interface VenueBooking {
 export class TopReservadas implements OnInit {
   venues: VenueBooking[] = [];
   maxBookings = 1;
+
+  private allVenuesData: VenueBooking[] = [];
+  private _filteredVenues: any[] | null = null;
+
+  @Input() set filteredVenues(list: any[] | null) {
+    this._filteredVenues = list;
+    this.applyFiltering();
+  }
 
   constructor(
     private http: HttpClient,
@@ -46,19 +54,28 @@ export class TopReservadas implements OnInit {
       }
     }).subscribe({
       next: (data) => {
-        // Sort descending, take top 5
-        this.venues = data
-          .sort((a, b) => b.bookingsCount - a.bookingsCount)
-          .slice(0, 5);
-        this.maxBookings = this.venues.length > 0
-          ? Math.max(...this.venues.map(v => v.bookingsCount), 1)
-          : 1;
-        this.cdr.detectChanges();
+        this.allVenuesData = data;
+        this.applyFiltering();
       },
       error: (err) => {
         console.error('Error fetching venues bookings:', err);
       }
     });
+  }
+
+  applyFiltering() {
+    let data = [...this.allVenuesData];
+    if (this._filteredVenues) {
+      const allowedIds = new Set(this._filteredVenues.map(v => v.venueId));
+      data = data.filter(v => allowedIds.has(v.id));
+    }
+    this.venues = data
+      .sort((a, b) => b.bookingsCount - a.bookingsCount)
+      .slice(0, 5);
+    this.maxBookings = this.venues.length > 0
+      ? Math.max(...this.venues.map(v => v.bookingsCount), 1)
+      : 1;
+    this.cdr.detectChanges();
   }
 
   getBarWidth(count: number): string {

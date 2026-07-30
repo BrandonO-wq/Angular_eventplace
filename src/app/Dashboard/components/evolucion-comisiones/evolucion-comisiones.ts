@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef, Input } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../Enviroments/Enviroment';
@@ -10,6 +10,7 @@ interface HostDebt {
   commissionAmount: number;
   paidAmount: number;
   status: string;
+  venueId: string;
 }
 
 interface MonthPoint {
@@ -48,6 +49,14 @@ export class EvolucionComisiones implements OnInit {
   comisionesDots: { cx: number; cy: number }[] = [];
   pendientesDots: { cx: number; cy: number }[] = [];
 
+  private allDebtsData: HostDebt[] = [];
+  private _filteredVenues: any[] | null = null;
+
+  @Input() set filteredVenues(list: any[] | null) {
+    this._filteredVenues = list;
+    this.applyFiltering();
+  }
+
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -73,11 +82,21 @@ export class EvolucionComisiones implements OnInit {
       }
     }).subscribe({
       next: (data) => {
-        this.processData(data);
-        this.cdr.detectChanges();
+        this.allDebtsData = data;
+        this.applyFiltering();
       },
       error: (err) => console.error('Error fetching host-debts:', err)
     });
+  }
+
+  applyFiltering() {
+    let data = [...this.allDebtsData];
+    if (this._filteredVenues) {
+      const allowedVenueIds = new Set(this._filteredVenues.map(v => v.venueId));
+      data = data.filter(d => allowedVenueIds.has(d.venueId));
+    }
+    this.processData(data);
+    this.cdr.detectChanges();
   }
 
   processData(data: HostDebt[]) {

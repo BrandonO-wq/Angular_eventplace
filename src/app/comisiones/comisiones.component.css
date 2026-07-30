@@ -603,6 +603,22 @@
   border: 1px solid #fca5a5;
 }
 
+.loading-badge {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.mini-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #cbd5e1;
+  border-top: 2px solid #64748b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
 /* Location cell */
 .location-cell {
   display: flex;
@@ -812,4 +828,279 @@
 .btn-disable:hover {
   background-color: #dc2626;
   box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+}
+
+/* ===== DISABLE VENUE MODAL STYLES ===== */
+.disable-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.disable-modal-container {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  animation: modalEnter 0.25s ease-out;
+  overflow: hidden;
+}
+
+.disable-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 10px 24px;
+}
+
+.disable-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.disable-modal-title-group h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.disable-icon {
+  color: #dc2626;
+}
+
+.close-modal-btn {
+  font-size: 24px;
+  color: #9ca3af;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-modal-btn:hover {
+  color: #4b5563;
+}
+
+.disable-modal-subtitle {
+  margin: 0 24px 15px 24px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.disable-modal-content {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.warning-card {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 12px;
+  padding: 16px;
+  color: #991b1b;
+}
+
+.warning-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13.5px;
+  margin-bottom: 8px;
+}
+
+.warning-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.warning-intro {
+  margin: 0 0 6px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.warning-main-text {
+  margin: 0 0 8px 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.warning-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12px;
+}
+
+.warning-list li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.details-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 14px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.detail-label {
+  color: #6b7280;
+}
+
+.detail-value {
+  color: #111827;
+  font-weight: 500;
+}
+
+.detail-value.text-bold {
+  font-weight: 700;
+}
+
+.status-pagado-text {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.status-vencido-text {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.status-pendiente-text {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.checkbox-alert-card {
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: #451a03;
+  font-weight: 600;
+  width: 100%;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #111827;
+  cursor: pointer;
+}
+
+.info-note-block {
+  background-color: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.note-text {
+  font-size: 12px;
+  color: #1e40af;
+  line-height: 1.4;
+}
+
+.disable-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px 20px 24px;
+  border-top: 1px solid #f3f4f6;
+  background-color: #f9fafb;
+}
+
+.btn-cancel-disable {
+  background-color: white;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-disable:hover {
+  background-color: #f3f4f6;
+  border-color: #c5c6c9;
+}
+
+.btn-cancel-disable:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-confirm-disable {
+  background-color: #dc2626;
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-confirm-disable:hover {
+  background-color: #b91c1c;
+}
+
+.btn-confirm-disable:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner-white {
+  border-top: 2px solid white !important;
+  border-right: 2px solid white !important;
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }

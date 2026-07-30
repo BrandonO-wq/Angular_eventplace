@@ -267,21 +267,28 @@
                 <span class="delay-tag">{{ report.delayDays }} días de retraso</span>
                 }
 
-                @if (report.debtStatus === 'PAID' || report.debtStatus === 'NONE') {
-                <span class="badge-status enabled-manually">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  Habilitada manualmente
-                </span>
+                @if (report.disabledStatus) {
+                  @if (report.disabledStatus.status === 'ACTIVE') {
+                  <span class="badge-status enabled-manually">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    {{ report.disabledStatus.description | titlecase }}
+                  </span>
+                  } @else {
+                  <span class="badge-status disabled-manually">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    {{ report.disabledStatus.description | titlecase }}
+                  </span>
+                  }
                 } @else {
-                <span class="badge-status disabled-manually">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                  Inhabilitada automáticamente
-                </span>
+                  <span class="badge-status loading-badge">
+                    <span class="mini-spinner"></span>
+                    Cargando estado...
+                  </span>
                 }
               </div>
             </td>
@@ -388,22 +395,42 @@
 
                 @if (expandedVenueId === report.venueId) {
                 <div class="actions-menu">
-                  @if (report.debtStatus === 'OVERDUE') {
-                  <button class="menu-btn btn-enable" (click)="toggleVenueStatus(report, true)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
-                      height="12">
-                      <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
-                    </svg>
-                    Habilitar
-                  </button>
+                  @if (report.disabledStatus) {
+                    @if (report.disabledStatus.status === 'INACTIVE') {
+                    <button class="menu-btn btn-enable" (click)="toggleVenueStatus(report, true)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
+                        height="12">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+                      </svg>
+                      Habilitar
+                    </button>
+                    } @else {
+                    <button class="menu-btn btn-disable" (click)="toggleVenueStatus(report, false)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
+                        height="12">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+                      </svg>
+                      Inhabilitar
+                    </button>
+                    }
                   } @else {
-                  <button class="menu-btn btn-disable" (click)="toggleVenueStatus(report, false)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
-                      height="12">
-                      <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
-                    </svg>
-                    Inhabilitar
-                  </button>
+                    @if (report.debtStatus === 'OVERDUE') {
+                    <button class="menu-btn btn-enable" (click)="toggleVenueStatus(report, true)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
+                        height="12">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+                      </svg>
+                      Habilitar
+                    </button>
+                    } @else {
+                    <button class="menu-btn btn-disable" (click)="toggleVenueStatus(report, false)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12"
+                        height="12">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+                      </svg>
+                      Inhabilitar
+                    </button>
+                    }
                   }
                 </div>
                 }
@@ -421,6 +448,111 @@
       </table>
     </div>
   </div>
+  }
+
+  <!-- Overlay Modal: Inhabilitar Cancha -->
+  @if (showDisableModal && venueToDisable) {
+    <div class="disable-modal-backdrop" (click)="closeDisableModal()">
+      <div class="disable-modal-container" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="disable-modal-header">
+          <div class="disable-modal-title-group">
+            <svg class="disable-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+            </svg>
+            <h2>Inhabilitar Cancha</h2>
+          </div>
+          <button class="close-modal-btn" (click)="closeDisableModal()">&times;</button>
+        </div>
+
+        <!-- Subtitle -->
+        <p class="disable-modal-subtitle">Esta acción inhabilitará la cancha en el aplicativo móvil</p>
+
+        <!-- Modal Content -->
+        <div class="disable-modal-content">
+          <!-- Warning Card -->
+          <div class="warning-card">
+            <div class="warning-title">
+              <svg class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              Advertencia Importante
+            </div>
+            <div class="warning-body">
+              <p class="warning-intro">Al inhabilitar la cancha:</p>
+              <p class="warning-main-text">La cancha <strong>"{{ venueToDisable.venueName }}"</strong> desaparecerá del aplicativo</p>
+              <ul class="warning-list">
+                <li>Los usuarios NO podrán buscarla ni reservarla</li>
+                <li>Las reservas existentes se mantendrán activas</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="details-section">
+            <div class="detail-row">
+              <span class="detail-label">Cancha:</span>
+              <span class="detail-value text-bold">{{ venueToDisable.venueName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Propietario:</span>
+              <span class="detail-value">{{ venueToDisable.ownerName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Estado:</span>
+              <span class="detail-value" [ngClass]="{
+                'status-pagado-text': venueToDisable.debtStatus === 'PAID',
+                'status-vencido-text': venueToDisable.debtStatus === 'OVERDUE',
+                'status-pendiente-text': venueToDisable.debtStatus === 'PENDING' || venueToDisable.debtStatus === 'LEGACY_PENDING'
+              }">
+                {{ venueToDisable.debtStatus === 'PAID' ? 'Pagado' : 
+                   venueToDisable.debtStatus === 'OVERDUE' ? 'Vencido' :
+                   venueToDisable.debtStatus === 'NONE' ? 'Al día' : 'Pendiente' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Checkbox notification -->
+          <div class="checkbox-alert-card">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="notifyOwnerOnDisable" />
+              <span>Enviar notificación al propietario sobre la inhabilitación</span>
+            </label>
+          </div>
+
+          <!-- Note block -->
+          <div class="info-note-block">
+            <div class="note-text">
+              @if (venueToDisable.debtStatus === 'OVERDUE') {
+                💡 <strong>Nota:</strong> Esta es una inhabilitación por falta de pago (automática).
+              } @else {
+                💡 <strong>Nota:</strong> Esta es una inhabilitación manual. Puedes rehabilitar la cancha en cualquier momento.
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="disable-modal-actions">
+          <button class="btn-cancel-disable" (click)="closeDisableModal()" [disabled]="disablingVenueInProgress">
+            Cancelar
+          </button>
+          <button class="btn-confirm-disable" (click)="confirmDisableVenue()" [disabled]="disablingVenueInProgress">
+            @if (disablingVenueInProgress) {
+              <span class="mini-spinner spinner-white"></span>
+              Inhabilitando...
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"></path>
+              </svg>
+              Sí, Inhabilitar Cancha
+            }
+          </button>
+        </div>
+      </div>
+    </div>
   }
 
 </div>

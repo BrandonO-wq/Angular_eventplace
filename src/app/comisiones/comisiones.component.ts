@@ -17,6 +17,12 @@ interface RegisteredHost {
   statusLastPeriod: string | null; // 'PENDING' | 'PAID' | 'OVERDUE' | 'LEGACY_PENDING' | null
 }
 
+interface VenueDisabledStatus {
+  description: string;
+  status: string;
+  disabledReason: number;
+}
+
 interface VenueReportItem {
   venueId: string;
   venueName: string;
@@ -34,6 +40,7 @@ interface VenueReportItem {
   deadline: string | null;
   pasarelaFee?: number;
   netAmount?: number;
+  disabledStatus?: VenueDisabledStatus;
 }
 
 @Component({
@@ -66,6 +73,12 @@ export class ComisionesComponent implements OnInit {
   searchQuery = '';
   activeFilter = 'Todos';
   expandedVenueId: string | null = null;
+
+  // Modal variables for disabling venues
+  showDisableModal = false;
+  venueToDisable: VenueReportItem | null = null;
+  notifyOwnerOnDisable = true;
+  disablingVenueInProgress = false;
 
   // Verification Dates
   todayStr = '';
@@ -259,11 +272,34 @@ export class ComisionesComponent implements OnInit {
               netAmount: netAmount
             };
           });
+          this.venueReports.forEach(item => {
+            this.fetchVenueDisabledStatus(item.venueId, token);
+          });
           this.applyFilters();
         }
       },
       error: (err) => {
         console.error('Error fetching venue reports:', err);
+      }
+    });
+  }
+
+  fetchVenueDisabledStatus(venueId: string, token: string): void {
+    this.http.get<VenueDisabledStatus>(`${environment.apiUrl}/host-debts/venue/${venueId}/disabled-status`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': '69420'
+      }
+    }).subscribe({
+      next: (res) => {
+        const report = this.venueReports.find(r => r.venueId === venueId);
+        if (report) {
+          report.disabledStatus = res;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error(`Error fetching disabled status for venue ${venueId}:`, err);
       }
     });
   }
@@ -316,6 +352,11 @@ export class ComisionesComponent implements OnInit {
   }
 
   toggleVenueStatus(report: VenueReportItem, enable: boolean): void {
+    if (!enable) {
+      this.openDisableModal(report);
+      return;
+    }
+
     let token = '';
     try {
       if (typeof localStorage !== 'undefined') {
@@ -341,6 +382,99 @@ export class ComisionesComponent implements OnInit {
       error: (err) => {
         console.error('Error toggling venue status:', err);
         alert(err?.error?.message || 'No se pudo actualizar el estado de la cancha.');
+      }
+    });
+  }
+
+  openDisableModal(report: VenueReportItem): void {
+    this.venueToDisable = report;
+    this.notifyOwnerOnDisable = true;
+    this.showDisableModal = true;
+  }
+
+  closeDisableModal(): void {
+    this.showDisableModal = false;
+    this.venueToDisable = null;
+  }
+
+  confirmDisableVenue(): void {
+    if (!this.venueToDisable) return;
+    this.disablingVenueInProgress = true;
+
+    let token = '';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('accessToken') || '';
+      }
+    } catch (e) {
+      console.error('Error accessing localStorage:', e);
+    }
+
+    if (!token) {
+      this.disablingVenueInProgress = false;
+      return;
+    }
+
+    if (this.notifyOwnerOnDisable) {
+      const host = this.hosts.find(h => h.email === this.venueToDisable?.ownerEmail);
+      const userId = host ? host.hostId : null;
+
+      if (userId) {
+        const isAutomaticDebt = this.venueToDisable.debtStatus === 'OVERDUE' || 
+                                this.venueToDisable.debtStatus === 'PENDING' || 
+                                this.venueToDisable.debtStatus === 'LEGACY_PENDING';
+        const title = '⚠️ Inhabilitación de Cancha';
+        const body = isAutomaticDebt
+          ? `Estimado propietario, le informamos que su salón "${this.venueToDisable.venueName}" va a ser inhabilitado por falta de pago.`
+          : `Estimado propietario, le informamos que su salón "${this.venueToDisable.venueName}" va a ser inhabilitado. Para más detalles, por favor contáctese con el área de soporte.`;
+
+        this.http.post<any>(
+          `${environment.apiUrl}/api/v1/admin/users/${userId}/notify-debt`,
+          { title, body },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'ngrok-skip-browser-warning': '69420'
+            }
+          }
+        ).subscribe({
+          next: () => {
+            console.log('Notificación de inhabilitación enviada con éxito.');
+            this.executeToggleVenueStatus(this.venueToDisable!, false, token);
+          },
+          error: (err) => {
+            console.error('Error sending inhabilitación notification:', err);
+            // Even if notification fails, we still proceed with disabling as requested
+            this.executeToggleVenueStatus(this.venueToDisable!, false, token);
+          }
+        });
+      } else {
+        console.warn('No se encontró hostId correspondiente al email del propietario para notificar.');
+        this.executeToggleVenueStatus(this.venueToDisable, false, token);
+      }
+    } else {
+      this.executeToggleVenueStatus(this.venueToDisable, false, token);
+    }
+  }
+
+  private executeToggleVenueStatus(report: VenueReportItem, enable: boolean, token: string): void {
+    this.http.post<any>(`${environment.apiUrl}/host-debts/venue/${report.venueId}/toggle-status?active=${enable}`, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': '69420'
+      }
+    }).subscribe({
+      next: (res) => {
+        alert(res?.message || 'Estado de la cancha actualizado con éxito.');
+        this.closeDisableModal();
+        this.disablingVenueInProgress = false;
+        this.expandedVenueId = null;
+        this.fetchVenueReports();
+      },
+      error: (err) => {
+        console.error('Error toggling venue status:', err);
+        alert(err?.error?.message || 'No se pudo actualizar el estado de la cancha.');
+        this.disablingVenueInProgress = false;
       }
     });
   }
