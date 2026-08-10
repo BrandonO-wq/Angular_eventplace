@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../Enviroments/Enviroment';
+import { retry, delay, catchError } from 'rxjs/operators';
+import { timer, EMPTY, throwError } from 'rxjs';
 
 export interface VenueReportBooking {
   id: string;
@@ -44,6 +46,7 @@ export class SalonesComponent implements OnInit {
   
   loading = false;
   errorMessage = '';
+  errorData = false;
 
   // Owner details modal state
   showOwnerModal = false;
@@ -76,7 +79,9 @@ export class SalonesComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (hosts) => {
         this.registeredHosts = hosts || [];
       },
@@ -250,6 +255,7 @@ export class SalonesComponent implements OnInit {
   fetchSalones(): void {
     this.loading = true;
     this.errorMessage = '';
+    this.errorData = false;
 
     let token = '';
     if (typeof localStorage !== 'undefined') {
@@ -261,7 +267,9 @@ export class SalonesComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (response) => {
         try {
           console.log('Respuesta de /venues/report/bookings:', response);
@@ -289,6 +297,7 @@ export class SalonesComponent implements OnInit {
       error: (err) => {
         console.error('Error fetching salones:', err);
         this.errorMessage = 'No se pudieron cargar los datos de los salones.';
+        this.errorData = true;
         this.loading = false;
       }
     });

@@ -1,7 +1,8 @@
-import { Component, inject, OnInit, Input } from '@angular/core';
+import { Component, inject, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { environment } from '../../../Enviroments/Enviroment';
+import { retry } from 'rxjs/operators';
 
 @Component({
   selector: 'app-crecimiento-plataforma',
@@ -11,6 +12,7 @@ import { environment } from '../../../Enviroments/Enviroment';
 })
 export class CrecimientoPlataforma implements OnInit {
   private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
   private apiUrl = environment.apiUrl;
 
   totalSalones: number = 4;
@@ -42,7 +44,11 @@ export class CrecimientoPlataforma implements OnInit {
 
   @Input() set filteredVenues(list: any[] | null) {
     this._filteredVenues = list;
-    this.calculateStats();
+    // Defer to avoid NG0100: changes happen after the parent's check cycle
+    Promise.resolve().then(() => {
+      this.calculateStats();
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnInit() {
@@ -54,7 +60,9 @@ export class CrecimientoPlataforma implements OnInit {
       headers: {
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (data) => {
         if (!this._filteredVenues) {
           if (data && typeof data.totalSalones === 'number') {
@@ -64,12 +72,14 @@ export class CrecimientoPlataforma implements OnInit {
             this.totalPropietarios = data.totalPropietarios;
           }
           this.updateChart();
+          this.cdr.markForCheck();
         }
       },
       error: (err) => {
         console.error('Error fetching platform stats:', err);
         if (!this._filteredVenues) {
           this.updateChart();
+          this.cdr.markForCheck();
         }
       }
     });

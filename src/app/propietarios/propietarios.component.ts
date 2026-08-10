@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../Enviroments/Enviroment';
+import { retry, delay, catchError } from 'rxjs/operators';
+import { timer, EMPTY, throwError } from 'rxjs';
 
 
 interface RegisteredHost {
@@ -45,6 +47,7 @@ export class PropietariosComponent implements OnInit {
   totalPages = 1;
   loading = false;
   errorMessage = '';
+  errorData = false;
 
   // Owner details modal state
   showOwnerModal = false;
@@ -68,6 +71,7 @@ export class PropietariosComponent implements OnInit {
   fetchHosts(): void {
     this.loading = true;
     this.errorMessage = '';
+    this.errorData = false;
 
     let token = '';
     if (typeof localStorage !== 'undefined') {
@@ -79,7 +83,10 @@ export class PropietariosComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      // Reintenta hasta 2 veces con 1.5s de espera en caso de error 500 (backend frío)
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (data) => {
         this.hosts = data;
         this.calculateKPIs();
@@ -88,7 +95,8 @@ export class PropietariosComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching hosts:', err);
-        this.errorMessage = 'No se pudieron cargar los datos de los propietarios.';
+        this.errorMessage = 'No se pudieron cargar los datos. Intenta recargar la página.';
+        this.errorData = true;
         this.loading = false;
       }
     });

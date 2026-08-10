@@ -6,6 +6,7 @@ import { environment } from '../Enviroments/Enviroment';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { retry } from 'rxjs/operators';
 
 // Import child components
 import { TopSalonesComponent } from '../Dashboard/components/top-salones/top-salones.component';
@@ -57,6 +58,7 @@ export class ReportesComponent implements OnInit {
   dateRangeStr: string = '10 de abril de 2026 - 8 de julio de 2026';
 
   loading = true;
+  errorVenues = false;   // true si /venues/report devuelve error
   generatingPdf = false;
   generatingExcel = false;
 
@@ -74,6 +76,7 @@ export class ReportesComponent implements OnInit {
 
   loadInitialData() {
     this.loading = true;
+    this.errorVenues = false;
     const token = this.getToken();
 
     // Fetch ubigeos
@@ -93,12 +96,20 @@ export class ReportesComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (venues) => {
         this.allVenues = venues || [];
+        this.errorVenues = false;
         this.applyFilters();
       },
-      error: (err) => console.error('Error fetching venues report:', err)
+      error: (err) => {
+        console.error('Error fetching venues report:', err);
+        this.errorVenues = true;
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
     });
 
     // Fetch bookings summary
@@ -107,7 +118,9 @@ export class ReportesComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (bookings) => {
         this.allBookings = bookings || [];
         this.applyFilters();
