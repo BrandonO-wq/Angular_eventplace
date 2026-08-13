@@ -48,7 +48,7 @@ export class SalonesComponent implements OnInit {
   // Owner details modal state
   showOwnerModal = false;
   selectedOwnerDetails: any = null;
-  selectedOwnerVenues: any[] = [];
+  selectedOwnerVenues: any[] | null = null;
   loadingOwnerDetails = false;
   totalEarningsSum = 0;
   registeredHosts: any[] = [];
@@ -57,7 +57,7 @@ export class SalonesComponent implements OnInit {
   showReminderModal = false;
   sendingReminder = false;
   currentHostId: string | null = null;
-  simulatedPayments: any[] = [];
+  payments: any[] | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -106,7 +106,8 @@ export class SalonesComponent implements OnInit {
     this.showOwnerModal = true;
     this.loadingOwnerDetails = true;
     this.selectedOwnerDetails = null;
-    this.selectedOwnerVenues = [];
+    this.selectedOwnerVenues = null;
+    this.payments = null;
     this.totalEarningsSum = 0;
 
     let token = '';
@@ -137,7 +138,6 @@ export class SalonesComponent implements OnInit {
       next: (venues) => {
         this.selectedOwnerVenues = venues || [];
         this.totalEarningsSum = this.selectedOwnerVenues.reduce((sum, v) => sum + (v.totalEarnings || 0), 0);
-        this.generateSimulatedPayments();
         this.checkLoadingState();
       },
       error: (err) => {
@@ -146,41 +146,50 @@ export class SalonesComponent implements OnInit {
         alert('No se pudieron cargar las canchas del dueño.');
       }
     });
+
+    // Fetch payments
+    this.http.get<any[]>(`${environment.apiUrl}/host-debts/payments?hostId=${hostId}`, { headers }).subscribe({
+      next: (data) => {
+        this.payments = (data || []).map(item => ({
+          id: item.id,
+          date: this.formatPaymentDate(item.fechaPago),
+          venue: item.nombreSalon || 'Cancha',
+          docType: item.tipoDoc === '1' || item.tipoDoc === 1 ? 'DNI' : (item.tipoDoc === '2' || item.tipoDoc === 2 ? 'RUC' : item.tipoDoc),
+          docNumber: item.nroDocumento,
+          amount: item.monto,
+          status: item.estado === 2 || item.estado === '2' ? 'Pagado' : `Estado ${item.estado}`
+        }));
+        this.checkLoadingState();
+      },
+      error: (err) => {
+        console.error('Error fetching payments:', err);
+        this.payments = [];
+        this.checkLoadingState();
+      }
+    });
   }
 
-  generateSimulatedPayments(): void {
-    const venues = this.selectedOwnerVenues || [];
-    const venueName = venues.length > 0 ? venues[0].name : 'Cancha Huaraz';
-    
-    // Generate 1 realistic payment as shown in screenshot
-    this.simulatedPayments = [
-      {
-        id: 1,
-        date: '18/06/2026 12:41 AM',
-        venue: venueName,
-        docType: 'BOLETA',
-        docNumber: '70983830',
-        amount: 20.00,
-        status: 'Aprobado'
-      }
-    ];
-
-    // Add a second one if they have more venues for variety
-    if (venues.length > 1) {
-      this.simulatedPayments.push({
-        id: 2,
-        date: '10/06/2026 04:15 PM',
-        venue: venues[1].name,
-        docType: 'FACTURA',
-        docNumber: '00192834',
-        amount: 35.50,
-        status: 'Aprobado'
-      });
+  formatPaymentDate(dateStr: string | null): string {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      const strTime = String(hours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
+      return `${day}/${month}/${year} ${strTime}`;
+    } catch (e) {
+      return dateStr;
     }
   }
 
   checkLoadingState(): void {
-    if (this.selectedOwnerDetails && this.selectedOwnerVenues) {
+    if (this.selectedOwnerDetails !== null && this.selectedOwnerVenues !== null && this.payments !== null) {
       this.loadingOwnerDetails = false;
     }
   }
@@ -188,9 +197,9 @@ export class SalonesComponent implements OnInit {
   closeOwnerModal(): void {
     this.showOwnerModal = false;
     this.selectedOwnerDetails = null;
-    this.selectedOwnerVenues = [];
+    this.selectedOwnerVenues = null;
     this.currentHostId = null;
-    this.simulatedPayments = [];
+    this.payments = null;
   }
 
   sendReminder(): void {

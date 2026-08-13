@@ -459,7 +459,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (payment of simulatedPayments; track payment.id) {
+                  @for (payment of payments; track payment.id) {
                     <tr>
                       <td>{{ payment.date }}</td>
                       <td class="payment-venue-cell">{{ payment.venue }}</td>
