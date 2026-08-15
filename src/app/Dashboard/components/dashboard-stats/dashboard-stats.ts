@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, Input } from '@angular/core';
+import { Component, inject, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../Enviroments/Enviroment';
+import { retry } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard-stats',
@@ -12,6 +13,7 @@ import { environment } from '../../../Enviroments/Enviroment';
 })
 export class DashboardStats implements OnInit {
   private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
   private apiUrl = environment.apiUrl;
 
   totalSalones: number = 4;
@@ -31,13 +33,20 @@ export class DashboardStats implements OnInit {
 
   @Input() set filteredVenues(list: any[] | null) {
     this._filteredVenues = list;
-    this.calculateStats();
-    this.filterDebtors();
+    // Defer to avoid NG0100: mutations after parent's change detection pass
+    Promise.resolve().then(() => {
+      this.calculateStats();
+      this.filterDebtors();
+      this.cdr.markForCheck();
+    });
   }
 
   @Input() set filteredBookings(list: any[] | null) {
     this._filteredBookings = list;
-    this.filterBookings();
+    Promise.resolve().then(() => {
+      this.filterBookings();
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnInit() {
@@ -51,7 +60,9 @@ export class DashboardStats implements OnInit {
       headers: {
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (data) => {
         if (!this._filteredVenues) {
           if (data && typeof data.totalSalones === 'number') {
@@ -60,6 +71,7 @@ export class DashboardStats implements OnInit {
           if (data && typeof data.totalPropietarios === 'number') {
             this.totalPropietarios = data.totalPropietarios;
           }
+          this.cdr.markForCheck();
         }
       },
       error: (err) => {
@@ -83,6 +95,7 @@ export class DashboardStats implements OnInit {
       next: (data) => {
         this.allBookingsData = data || [];
         this.filterBookings();
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error fetching bookings for stats:', err);
@@ -105,6 +118,7 @@ export class DashboardStats implements OnInit {
       next: (data) => {
         this.allDebtorsData = data || [];
         this.filterDebtors();
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error fetching debtors for stats:', err);

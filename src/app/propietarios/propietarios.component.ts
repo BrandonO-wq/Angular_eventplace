@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../Enviroments/Enviroment';
+import { retry, delay, catchError } from 'rxjs/operators';
+import { timer, EMPTY, throwError } from 'rxjs';
 
 
 interface RegisteredHost {
@@ -45,6 +47,7 @@ export class PropietariosComponent implements OnInit {
   totalPages = 1;
   loading = false;
   errorMessage = '';
+  errorData = false;
 
   // Owner details modal state
   showOwnerModal = false;
@@ -59,19 +62,32 @@ export class PropietariosComponent implements OnInit {
   currentHostId: string | null = null;
   payments: any[] | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
-    this.fetchHosts();
+    if (isPlatformBrowser(this.platformId)) {
+      this.fetchHosts();
+    } else {
+      this.loading = false;
+    }
   }
 
   fetchHosts(): void {
     this.loading = true;
     this.errorMessage = '';
+    this.errorData = false;
 
     let token = '';
-    if (typeof localStorage !== 'undefined') {
-      token = localStorage.getItem('accessToken') || '';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('accessToken') || '';
+      }
+    } catch (e) {
+      console.error('Error accessing localStorage:', e);
     }
 
     this.http.get<RegisteredHost[]>(`${environment.apiUrl}/host-debts/registered-hosts`, {
@@ -79,17 +95,23 @@ export class PropietariosComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      // Reintenta hasta 2 veces con 1.5s de espera en caso de error 500 (backend frío)
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (data) => {
         this.hosts = data;
         this.calculateKPIs();
         this.applyFilters();
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching hosts:', err);
-        this.errorMessage = 'No se pudieron cargar los datos de los propietarios.';
+        this.errorMessage = 'No se pudieron cargar los datos. Intenta recargar la página.';
+        this.errorData = true;
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

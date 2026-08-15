@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../Enviroments/Enviroment';
+import { retry, delay, catchError } from 'rxjs/operators';
+import { timer, EMPTY, throwError } from 'rxjs';
 
 export interface VenueReportBooking {
   id: string;
@@ -44,6 +46,7 @@ export class SalonesComponent implements OnInit {
   
   loading = false;
   errorMessage = '';
+  errorData = false;
 
   // Owner details modal state
   showOwnerModal = false;
@@ -59,26 +62,41 @@ export class SalonesComponent implements OnInit {
   currentHostId: string | null = null;
   payments: any[] | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.fetchSalones();
-    this.fetchRegisteredHosts();
+    if (isPlatformBrowser(this.platformId)) {
+      this.fetchSalones();
+      this.fetchRegisteredHosts();
+    } else {
+      this.loading = false;
+    }
   }
 
   fetchRegisteredHosts(): void {
     let token = '';
-    if (typeof localStorage !== 'undefined') {
-      token = localStorage.getItem('accessToken') || '';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('accessToken') || '';
+      }
+    } catch (e) {
+      console.error('Error accessing localStorage:', e);
     }
     this.http.get<any[]>(`${environment.apiUrl}/host-debts/registered-hosts`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (hosts) => {
         this.registeredHosts = hosts || [];
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching registered hosts:', err);
@@ -191,6 +209,7 @@ export class SalonesComponent implements OnInit {
   checkLoadingState(): void {
     if (this.selectedOwnerDetails !== null && this.selectedOwnerVenues !== null && this.payments !== null) {
       this.loadingOwnerDetails = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -259,10 +278,15 @@ export class SalonesComponent implements OnInit {
   fetchSalones(): void {
     this.loading = true;
     this.errorMessage = '';
+    this.errorData = false;
 
     let token = '';
-    if (typeof localStorage !== 'undefined') {
-      token = localStorage.getItem('accessToken') || '';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('accessToken') || '';
+      }
+    } catch (e) {
+      console.error('Error accessing localStorage:', e);
     }
 
     this.http.get<any>(`${environment.apiUrl}/venues/report/bookings`, {
@@ -270,7 +294,9 @@ export class SalonesComponent implements OnInit {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
       }
-    }).subscribe({
+    }).pipe(
+      retry({ count: 2, delay: 1500 })
+    ).subscribe({
       next: (response) => {
         try {
           console.log('Respuesta de /venues/report/bookings:', response);
@@ -293,12 +319,15 @@ export class SalonesComponent implements OnInit {
           this.errorMessage = 'Hubo un error al procesar la respuesta del servidor.';
         } finally {
           this.loading = false;
+          this.cdr.detectChanges();
         }
       },
       error: (err) => {
         console.error('Error fetching salones:', err);
         this.errorMessage = 'No se pudieron cargar los datos de los salones.';
+        this.errorData = true;
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

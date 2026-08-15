@@ -80,6 +80,19 @@ export class ComisionesComponent implements OnInit {
   notifyOwnerOnDisable = true;
   disablingVenueInProgress = false;
 
+  // Owner details modal state
+  showOwnerModal = false;
+  selectedOwnerDetails: any = null;
+  selectedOwnerVenues: any[] | null = null;
+  loadingOwnerDetails = false;
+  totalEarningsSum = 0;
+
+  // Reminder modal state
+  showReminderModal = false;
+  sendingReminder = false;
+  currentHostId: string | null = null;
+  payments: any[] | null = null;
+
   // Verification Dates
   todayStr = '';
   nextSundayStr = '';
@@ -475,6 +488,190 @@ export class ComisionesComponent implements OnInit {
         console.error('Error toggling venue status:', err);
         alert(err?.error?.message || 'No se pudo actualizar el estado de la cancha.');
         this.disablingVenueInProgress = false;
+      }
+    });
+  }
+
+  openOwnerModal(report: VenueReportItem): void {
+    let hostId = (report as any).hostId || (report as any).ownerId;
+    if (!hostId && (report.ownerEmail || report.ownerName)) {
+      const found = this.hosts.find(
+        h => (report.ownerEmail && h.email && h.email.toLowerCase() === report.ownerEmail.toLowerCase()) ||
+             (report.ownerName && h.hostName && h.hostName.toLowerCase() === report.ownerName.toLowerCase())
+      );
+      if (found) {
+        hostId = found.hostId;
+      }
+    }
+
+    if (!hostId) {
+      alert('No se pudo encontrar el ID del propietario.');
+      return;
+    }
+
+    this.currentHostId = hostId;
+    this.showOwnerModal = true;
+    this.loadingOwnerDetails = true;
+    this.selectedOwnerDetails = null;
+    this.selectedOwnerVenues = null;
+    this.payments = null;
+    this.totalEarningsSum = 0;
+
+    let token = '';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('accessToken') || '';
+      }
+    } catch (e) {
+      console.error('Error accessing localStorage:', e);
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'ngrok-skip-browser-warning': '69420'
+    };
+
+    // Fetch host details
+    this.http.get<any>(`${environment.apiUrl}/host-detail/${hostId}`, { headers }).subscribe({
+      next: (details) => {
+        this.selectedOwnerDetails = details;
+        this.checkLoadingState();
+      },
+      error: (err) => {
+        console.error('Error fetching host details:', err);
+        this.loadingOwnerDetails = false;
+        this.cdr.detectChanges();
+        alert('No se pudieron cargar los detalles del propietario.');
+      }
+    });
+
+    // Fetch host venues
+    this.http.get<any[]>(`${environment.apiUrl}/venues/host/${hostId}`, { headers }).subscribe({
+      next: (venues) => {
+        this.selectedOwnerVenues = venues || [];
+        this.totalEarningsSum = this.selectedOwnerVenues.reduce((sum, v) => sum + (v.totalEarnings || 0), 0);
+        this.checkLoadingState();
+      },
+      error: (err) => {
+        console.error('Error fetching host venues:', err);
+        this.loadingOwnerDetails = false;
+        this.cdr.detectChanges();
+        alert('No se pudieron cargar las canchas del propietario.');
+      }
+    });
+
+    // Fetch payments
+    this.http.get<any[]>(`${environment.apiUrl}/host-debts/payments?hostId=${hostId}`, { headers }).subscribe({
+      next: (data) => {
+        this.payments = (data || []).map(item => ({
+          id: item.id,
+          date: this.formatPaymentDate(item.fechaPago),
+          venue: item.nombreSalon || 'Cancha',
+          docType: item.tipoDoc === '1' || item.tipoDoc === 1 ? 'DNI' : (item.tipoDoc === '2' || item.tipoDoc === 2 ? 'RUC' : item.tipoDoc),
+          docNumber: item.nroDocumento,
+          amount: item.monto,
+          status: item.estado === 2 || item.estado === '2' ? 'Pagado' : `Estado ${item.estado}`
+        }));
+        this.checkLoadingState();
+      },
+      error: (err) => {
+        console.error('Error fetching payments:', err);
+        this.payments = [];
+        this.checkLoadingState();
+      }
+    });
+  }
+
+  formatPaymentDate(dateStr: string | null): string {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const strTime = String(hours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
+      return `${day}/${month}/${year} ${strTime}`;
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  checkLoadingState(): void {
+    if (this.selectedOwnerDetails !== null && this.selectedOwnerVenues !== null && this.payments !== null) {
+      this.loadingOwnerDetails = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  closeOwnerModal(): void {
+    this.showOwnerModal = false;
+    this.selectedOwnerDetails = null;
+    this.selectedOwnerVenues = null;
+    this.currentHostId = null;
+    this.payments = null;
+  }
+
+  sendReminder(): void {
+    this.showReminderModal = true;
+  }
+
+  closeReminderModal(): void {
+    if (!this.sendingReminder) {
+      this.showReminderModal = false;
+    }
+  }
+
+  confirmSendReminder(): void {
+    if (!this.currentHostId || !this.selectedOwnerDetails) {
+      alert('No se pudo determinar la información del propietario.');
+      return;
+    }
+
+    this.sendingReminder = true;
+    
+    let token = '';
+    try {
+      if (typeof localStorage !== 'undefined') {
+        token = localStorage.getItem('accessToken') || '';
+      }
+    } catch (e) {
+      console.error('Error accessing localStorage:', e);
+    }
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'ngrok-skip-browser-warning': '69420'
+    };
+
+    const debtAmountFormatted = (this.selectedOwnerDetails.debtAmount || 0).toFixed(2);
+    const delayDays = this.selectedOwnerDetails.delayDays || 0;
+
+    const payload = {
+      title: '⚠️ Deuda Vencida',
+      body: `Tienes una deuda vencida de S/ ${debtAmountFormatted} con ${delayDays} días de retraso. Regulariza tu pago para reactivar tus salones`
+    };
+
+    this.http.post<any>(
+      `${environment.apiUrl}/api/v1/admin/users/${this.currentHostId}/notify-debt`,
+      payload,
+      { headers }
+    ).subscribe({
+      next: (response) => {
+        this.sendingReminder = false;
+        this.showReminderModal = false;
+        this.cdr.detectChanges();
+        alert('Notificación de recordatorio enviada con éxito.');
+      },
+      error: (err) => {
+        console.error('Error sending debt notification:', err);
+        this.sendingReminder = false;
+        this.cdr.detectChanges();
+        alert('Ocurrió un error al enviar la notificación de recordatorio.');
       }
     });
   }
