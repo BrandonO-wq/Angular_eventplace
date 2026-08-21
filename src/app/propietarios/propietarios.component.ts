@@ -259,7 +259,7 @@ export class PropietariosComponent implements OnInit {
       error: (err) => {
         console.error('Error fetching host venues:', err);
         this.loadingOwnerDetails = false;
-        alert('No se pudieron cargar las canchas del dueño.');
+        alert('No se pudieron cargar los salones del dueño.');
       }
     });
 
@@ -335,7 +335,7 @@ export class PropietariosComponent implements OnInit {
     }
 
     this.sendingReminder = true;
-    
+
     let token = '';
     if (typeof localStorage !== 'undefined') {
       token = localStorage.getItem('accessToken') || '';

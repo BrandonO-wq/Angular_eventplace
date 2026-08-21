@@ -43,7 +43,7 @@ export class SalonesComponent implements OnInit {
   eventTypeFilter = '';
   stateFilter = '';
   sortFilter = '';
-  
+
   loading = false;
   errorMessage = '';
   errorData = false;
@@ -66,7 +66,7 @@ export class SalonesComponent implements OnInit {
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -161,7 +161,7 @@ export class SalonesComponent implements OnInit {
       error: (err) => {
         console.error('Error fetching host venues:', err);
         this.loadingOwnerDetails = false;
-        alert('No se pudieron cargar las canchas del dueño.');
+        alert('No se pudieron cargar los salones del dueño.');
       }
     });
 
@@ -238,7 +238,7 @@ export class SalonesComponent implements OnInit {
     }
 
     this.sendingReminder = true;
-    
+
     let token = '';
     if (typeof localStorage !== 'undefined') {
       token = localStorage.getItem('accessToken') || '';
@@ -300,7 +300,7 @@ export class SalonesComponent implements OnInit {
       next: (response) => {
         try {
           console.log('Respuesta de /venues/report/bookings:', response);
-          
+
           let dataArray: VenueReportBooking[] = [];
           if (Array.isArray(response)) {
             dataArray = response;
@@ -337,7 +337,7 @@ export class SalonesComponent implements OnInit {
     this.activosCount = this.filteredSalones.length;
     this.reservasCount = this.filteredSalones.reduce((sum, s) => sum + (s.bookingsCount || 0), 0);
     this.totalComisiones = this.filteredSalones.reduce((sum, s) => sum + (s.commissionLastPeriod || 0), 0);
-    
+
     if (this.filteredSalones.length > 0) {
       const totalRatings = this.filteredSalones.reduce((sum, s) => sum + (s.reviewsAverage || 0), 0);
       this.avgRating = totalRatings / this.filteredSalones.length;
@@ -352,7 +352,7 @@ export class SalonesComponent implements OnInit {
     // Búsqueda por texto
     if (this.searchQuery && this.searchQuery.trim() !== '') {
       const query = this.searchQuery.toLowerCase().trim();
-      result = result.filter(s => 
+      result = result.filter(s =>
         (s.name && s.name.toLowerCase().includes(query)) ||
         (s.ownerName && s.ownerName.toLowerCase().includes(query)) ||
         (s.address && s.address.toLowerCase().includes(query))

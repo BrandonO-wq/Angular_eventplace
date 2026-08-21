@@ -102,7 +102,7 @@ export class ComisionesComponent implements OnInit {
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.calculateDates();
@@ -224,27 +224,27 @@ export class ComisionesComponent implements OnInit {
 
   calculateDates(): void {
     const now = new Date();
-    
+
     // Format current date: "Hoy: [Día], [dd] [Mes] [yyyy]"
     const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    
+
     const dayName = days[now.getDay()];
     const dayNum = String(now.getDate()).padStart(2, '0');
     const monthName = months[now.getMonth()];
     const year = now.getFullYear();
-    
+
     this.todayStr = `Hoy: ${dayName}, ${dayNum} ${monthName} ${year}`;
-    
+
     // Next Sunday:
     const daysToSunday = (7 - now.getDay()) % 7;
     const nextSunday = new Date(now);
     nextSunday.setDate(now.getDate() + (daysToSunday === 0 ? 7 : daysToSunday));
-    
+
     // Next Monday is next Sunday + 1 day
     const nextMonday = new Date(nextSunday);
     nextMonday.setDate(nextSunday.getDate() + 1);
-    
+
     this.nextSundayStr = this.formatDate(nextSunday);
     this.nextMondayStr = this.formatDate(nextMonday);
   }
@@ -322,9 +322,9 @@ export class ComisionesComponent implements OnInit {
 
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase().trim();
-      temp = temp.filter(item => 
-        (item.venueName && item.venueName.toLowerCase().includes(query)) || 
-        (item.ownerName && item.ownerName.toLowerCase().includes(query)) || 
+      temp = temp.filter(item =>
+        (item.venueName && item.venueName.toLowerCase().includes(query)) ||
+        (item.ownerName && item.ownerName.toLowerCase().includes(query)) ||
         (item.ownerEmail && item.ownerEmail.toLowerCase().includes(query))
       );
     }
@@ -388,13 +388,13 @@ export class ComisionesComponent implements OnInit {
       }
     }).subscribe({
       next: (res) => {
-        alert(res?.message || 'Estado de la cancha actualizado con éxito.');
+        alert(res?.message || 'Estado del salón actualizado con éxito.');
         this.expandedVenueId = null;
         this.fetchVenueReports();
       },
       error: (err) => {
         console.error('Error toggling venue status:', err);
-        alert(err?.error?.message || 'No se pudo actualizar el estado de la cancha.');
+        alert(err?.error?.message || 'No se pudo actualizar el estado del salón.');
       }
     });
   }
@@ -433,10 +433,10 @@ export class ComisionesComponent implements OnInit {
       const userId = host ? host.hostId : null;
 
       if (userId) {
-        const isAutomaticDebt = this.venueToDisable.debtStatus === 'OVERDUE' || 
-                                this.venueToDisable.debtStatus === 'PENDING' || 
-                                this.venueToDisable.debtStatus === 'LEGACY_PENDING';
-        const title = '⚠️ Inhabilitación de Cancha';
+        const isAutomaticDebt = this.venueToDisable.debtStatus === 'OVERDUE' ||
+          this.venueToDisable.debtStatus === 'PENDING' ||
+          this.venueToDisable.debtStatus === 'LEGACY_PENDING';
+        const title = '⚠️ Inhabilitación del Salón';
         const body = isAutomaticDebt
           ? `Estimado propietario, le informamos que su salón "${this.venueToDisable.venueName}" va a ser inhabilitado por falta de pago.`
           : `Estimado propietario, le informamos que su salón "${this.venueToDisable.venueName}" va a ser inhabilitado. Para más detalles, por favor contáctese con el área de soporte.`;
@@ -478,7 +478,7 @@ export class ComisionesComponent implements OnInit {
       }
     }).subscribe({
       next: (res) => {
-        alert(res?.message || 'Estado de la cancha actualizado con éxito.');
+        alert(res?.message || 'Estado del salón actualizado con éxito.');
         this.closeDisableModal();
         this.disablingVenueInProgress = false;
         this.expandedVenueId = null;
@@ -486,7 +486,7 @@ export class ComisionesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error toggling venue status:', err);
-        alert(err?.error?.message || 'No se pudo actualizar el estado de la cancha.');
+        alert(err?.error?.message || 'No se pudo actualizar el estado del salón');
         this.disablingVenueInProgress = false;
       }
     });
@@ -497,7 +497,7 @@ export class ComisionesComponent implements OnInit {
     if (!hostId && (report.ownerEmail || report.ownerName)) {
       const found = this.hosts.find(
         h => (report.ownerEmail && h.email && h.email.toLowerCase() === report.ownerEmail.toLowerCase()) ||
-             (report.ownerName && h.hostName && h.hostName.toLowerCase() === report.ownerName.toLowerCase())
+          (report.ownerName && h.hostName && h.hostName.toLowerCase() === report.ownerName.toLowerCase())
       );
       if (found) {
         hostId = found.hostId;
@@ -556,7 +556,7 @@ export class ComisionesComponent implements OnInit {
         console.error('Error fetching host venues:', err);
         this.loadingOwnerDetails = false;
         this.cdr.detectChanges();
-        alert('No se pudieron cargar las canchas del propietario.');
+        alert('No se pudieron cargar los salones del propietario.');
       }
     });
 
@@ -633,7 +633,7 @@ export class ComisionesComponent implements OnInit {
     }
 
     this.sendingReminder = true;
-    
+
     let token = '';
     try {
       if (typeof localStorage !== 'undefined') {

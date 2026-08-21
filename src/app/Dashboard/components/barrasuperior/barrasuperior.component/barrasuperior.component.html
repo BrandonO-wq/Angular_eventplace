@@ -49,423 +49,425 @@
 
 <!-- Commission Modal Backdrop -->
 @if (showCommissionModal) {
-  <div class="com-modal-backdrop" (click)="closeCommissionModal()">
-    <div class="com-modal-container" (click)="$event.stopPropagation()">
-      
-      <!-- Modal Header -->
-      <div class="com-modal-header">
-        <div class="com-modal-title-row">
-          <span class="com-modal-icon">%</span>
-          <h2>Configurar Porcentaje de Comisión</h2>
-        </div>
-        <button class="com-close-btn" (click)="closeCommissionModal()" [disabled]="loading">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+<div class="com-modal-backdrop" (click)="closeCommissionModal()">
+  <div class="com-modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="com-modal-header">
+      <div class="com-modal-title-row">
+        <span class="com-modal-icon">%</span>
+        <h2>Configurar Porcentaje de Comisión</h2>
       </div>
-
-      <!-- Modal Content -->
-      <div class="com-modal-content">
-        <p class="com-modal-subtitle">
-          Define el porcentaje de comisión que se cobrará por cada hora de alquiler de canchas en el aplicativo
-        </p>
-
-        <!-- Info Card -->
-        <div class="com-info-card">
-          <span class="com-info-pin">📌</span>
-          <div class="com-info-text-col">
-            <h4 class="com-info-title">Información importante</h4>
-            <p class="com-info-desc">
-              Los propietarios pagarán este porcentaje sobre los ingresos de cada cancha registrada en el aplicativo.
-            </p>
-          </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="com-input-section">
-          <label class="com-input-label">Porcentaje de Comisión (%)</label>
-          <div class="com-input-row">
-            <div class="com-input-wrapper">
-              <input type="number" 
-                     class="com-number-input" 
-                     [(ngModel)]="commissionValue" 
-                     min="0" 
-                     max="100" 
-                     step="0.1" 
-                     [disabled]="loading" />
-            </div>
-            <div class="com-preview-value">
-              {{ commissionValue }}%
-            </div>
-          </div>
-          <span class="com-help-text">Ingresa un valor entre 0 y 100</span>
-        </div>
-
-        <!-- Error feedback -->
-        @if (errorMessage) {
-          <div class="com-error-alert">
-            {{ errorMessage }}
-          </div>
-        }
-
-        <!-- Modal Actions -->
-        <div class="com-modal-actions">
-          <button class="com-btn-cancel" (click)="closeCommissionModal()" [disabled]="loading">
-            Cancelar
-          </button>
-          <button class="com-btn-save" (click)="submitCommissionChange()" [disabled]="loading || commissionValue === null || commissionValue < 0 || commissionValue > 100">
-            @if (loading) {
-              <span class="com-spinner"></span> Guardando...
-            } @else {
-              <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
-              Guardar Configuración
-            }
-          </button>
-        </div>
-      </div>
-
+      <button class="com-close-btn" (click)="closeCommissionModal()" [disabled]="loading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
-  </div>
-}
 
-<!-- OTP Verification Modal Backdrop -->
-@if (showOtpModal) {
-  <div class="com-modal-backdrop" (click)="closeOtpModal()">
-    <div class="com-modal-container" (click)="$event.stopPropagation()">
-      
-      <!-- Modal Header -->
-      <div class="com-modal-header">
-        <div class="com-modal-title-row">
-          <span class="com-modal-icon key-icon">🔑</span>
-          <h2>Confirmar Cambio de Comisión</h2>
-        </div>
-        <button class="com-close-btn" (click)="closeOtpModal()" [disabled]="loading">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
+    <!-- Modal Content -->
+    <div class="com-modal-content">
+      <p class="com-modal-subtitle">
+        Define el porcentaje de comisión que se cobrará por cada hora de alquiler del salón en el aplicativo
+      </p>
 
-      <!-- Modal Content -->
-      <div class="com-modal-content">
-        <p class="com-modal-subtitle">
-          Se ha enviado un código de verificación (OTP) para autorizar este cambio. Ingrésalo a continuación para confirmar el nuevo valor de <strong>{{ commissionValue }}%</strong>.
-        </p>
-
-        <!-- Info Card -->
-        <div class="com-info-card otp-card">
-          <span class="com-info-pin">🔐</span>
-          <div class="com-info-text-col">
-            <h4 class="com-info-title">Autorización Requerida</h4>
-            <p class="com-info-desc">
-              Esta acción modificará la tasa de comisión cobrada a los propietarios.
-            </p>
-          </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="com-input-section">
-          <label class="com-input-label">Código OTP</label>
-          <input type="text" 
-                 class="com-text-input" 
-                 placeholder="Ingresa el código OTP" 
-                 [(ngModel)]="otpValue" 
-                 [disabled]="loading" />
-        </div>
-
-        <!-- Error/Success feedback -->
-        @if (errorMessage) {
-          <div class="com-error-alert">
-            {{ errorMessage }}
-          </div>
-        }
-        @if (successMessage) {
-          <div class="com-success-alert">
-            {{ successMessage }}
-          </div>
-        }
-
-        <!-- Modal Actions -->
-        <div class="com-modal-actions">
-          <button class="com-btn-cancel" (click)="closeOtpModal()" [disabled]="loading">
-            Cancelar
-          </button>
-          <button class="com-btn-save" (click)="confirmOtp()" [disabled]="loading || !otpValue">
-            @if (loading) {
-              <span class="com-spinner"></span> Confirmando...
-            } @else {
-              <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Confirmar Cambio
-            }
-          </button>
+      <!-- Info Card -->
+      <div class="com-info-card">
+        <span class="com-info-pin">📌</span>
+        <div class="com-info-text-col">
+          <h4 class="com-info-title">Información importante</h4>
+          <p class="com-info-desc">
+            Los propietarios pagarán este porcentaje sobre los ingresos de cada salón registrado en el aplicativo.
+          </p>
         </div>
       </div>
 
-    </div>
-  </div>
-}
-
-<!-- Modal: Configurar Ciclo Semanal de Comisiones -->
-@if (showCycleModal) {
-  <div class="cycle-modal-backdrop" (click)="closeCycleModal()">
-    <div class="cycle-modal-container" (click)="$event.stopPropagation()">
-      <!-- Header -->
-      <div class="cycle-modal-header">
-        <div class="cycle-modal-title-row">
-          <div class="cycle-modal-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+      <!-- Input Area -->
+      <div class="com-input-section">
+        <label class="com-input-label">Porcentaje de Comisión (%)</label>
+        <div class="com-input-row">
+          <div class="com-input-wrapper">
+            <input type="number" class="com-number-input" [(ngModel)]="commissionValue" min="0" max="100" step="0.1"
+              [disabled]="loading" />
           </div>
-          <div class="cycle-header-text">
-            <h2>Configurar Ciclo Semanal de Comisiones</h2>
-            <p class="cycle-modal-subtitle">Define el período de cobro semanal y la fecha límite de pago de comisiones</p>
+          <div class="com-preview-value">
+            {{ commissionValue }}%
           </div>
         </div>
-        <button class="cycle-close-btn" (click)="closeCycleModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+        <span class="com-help-text">Ingresa un valor entre 0 y 100</span>
       </div>
 
-      <!-- Content -->
-      <div class="cycle-modal-content">
-        @if (loading && !cycleConfig) {
-          <div class="cycle-modal-loading">
-            <div class="com-spinner"></div>
-            <p>Cargando configuración del ciclo...</p>
-          </div>
-        } @else if (cycleConfig) {
-          <!-- ¿Cómo funciona el ciclo semanal? -->
-          <div class="cycle-info-card">
-            <span class="info-icon">📋</span>
-            <div class="info-text-col">
-              <p class="info-title">¿Cómo funciona el ciclo semanal?</p>
-              <p class="info-desc">
-                El ciclo semanal tiene una duración de <strong>{{ cycleConfig.cycleDays || 7 }} días</strong>. Define cuándo comienza el período de cobro. El ciclo termina siempre a las <strong>11:59 PM</strong> del día {{ cycleConfig.cycleDays || 7 }}.
-              </p>
-              <p class="info-desc mt-8">
-                La fecha límite de pago es el <strong>último día del ciclo</strong> a las <strong>11:59 PM</strong> (mismo día que termina el ciclo).
-              </p>
-            </div>
-          </div>
-
-          <!-- Step 1: Inicio del Ciclo Semanal -->
-          <div class="step-header">
-            <span class="step-number step-blue">1</span>
-            <h3>Inicio del Ciclo Semanal</h3>
-          </div>
-
-          <div class="dropdowns-row">
-            <div class="dropdown-group flex-2">
-              <label>Día de inicio</label>
-              <div class="select-wrapper">
-                <select [(ngModel)]="selectedStartDay">
-                  <option [value]="1">Lunes</option>
-                  <option [value]="2">Martes</option>
-                  <option [value]="3">Miércoles</option>
-                  <option [value]="4">Jueves</option>
-                  <option [value]="5">Viernes</option>
-                  <option [value]="6">Sábado</option>
-                  <option [value]="7">Domingo</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="dropdown-group flex-3">
-              <label>Hora de inicio</label>
-              <div class="time-selects">
-                <div class="select-wrapper">
-                  <select [(ngModel)]="selectedStartHour">
-                    @for (hr of hoursList; track hr) {
-                      <option [value]="+hr">{{ hr }}</option>
-                    }
-                  </select>
-                </div>
-                <span class="time-separator">:</span>
-                <div class="select-wrapper select-disabled">
-                  <select disabled>
-                    <option>00</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 2: Cálculos Automáticos -->
-          <div class="step-header">
-            <span class="step-number step-green">2</span>
-            <h3>Cálculos Automáticos</h3>
-          </div>
-
-          <div class="calc-cards-col">
-            <div class="calc-card">
-              <span class="calc-icon">📅</span>
-              <div class="calc-text">
-                <span class="calc-label">Fin del ciclo ({{ cycleConfig.cycleDays || 7 }} días después):</span>
-                <span class="calc-value font-bold">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr }}</span>
-              </div>
-            </div>
-
-            <div class="calc-card border-red bg-red">
-              <span class="calc-icon text-red">⚠️</span>
-              <div class="calc-text text-red">
-                <span class="calc-label text-red">Fecha límite de pago (último día del ciclo):</span>
-                <span class="calc-value font-bold text-red">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr }}</span>
-                <span class="calc-subtext">Los propietarios deben pagar antes de que termine el ciclo</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Resumen de Configuración -->
-          <div class="summary-card">
-            <div class="summary-header">
-              <span class="summary-icon">📋</span>
-              <h4>Resumen de Configuración</h4>
-            </div>
-            <div class="summary-rows">
-              <div class="summary-row">
-                <span class="summary-label">Ciclo inicia:</span>
-                <span class="summary-value">{{ daysList[selectedStartDay - 1] }} a las {{ calculatedStartHourStr }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label">Ciclo termina:</span>
-                <span class="summary-value">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label text-red">Limite de pago:</span>
-                <span class="summary-value text-red text-bold">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr }}</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label">Duración:</span>
-                <span class="summary-value">{{ calculatedDurationStr }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Importante Card -->
-          <div class="important-card">
-            <span class="important-icon">⚠️</span>
-            <div class="important-text-col">
-              <p class="important-title">Importante</p>
-              <p class="important-desc">
-                Los cambios en la configuración del ciclo se aplicarán en el próximo ciclo. El ciclo actual continuará con la configuración anterior.
-              </p>
-            </div>
-          </div>
-        }
+      <!-- Error feedback -->
+      @if (errorMessage) {
+      <div class="com-error-alert">
+        {{ errorMessage }}
       </div>
+      }
 
-      <!-- Footer / Actions -->
-      <div class="cycle-modal-footer">
-        <button class="com-btn-cancel" (click)="closeCycleModal()" [disabled]="loading">
+      <!-- Modal Actions -->
+      <div class="com-modal-actions">
+        <button class="com-btn-cancel" (click)="closeCommissionModal()" [disabled]="loading">
           Cancelar
         </button>
-        <button class="com-btn-save" (click)="submitCycleChange()" [disabled]="loading">
+        <button class="com-btn-save" (click)="submitCommissionChange()"
+          [disabled]="loading || commissionValue === null || commissionValue < 0 || commissionValue > 100">
           @if (loading) {
-            <span class="com-spinner"></span> Enviando OTP...
+          <span class="com-spinner"></span> Guardando...
           } @else {
-            <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            Aceptar
+          <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+          Guardar Configuración
           }
         </button>
       </div>
     </div>
+
   </div>
+</div>
+}
+
+<!-- OTP Verification Modal Backdrop -->
+@if (showOtpModal) {
+<div class="com-modal-backdrop" (click)="closeOtpModal()">
+  <div class="com-modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="com-modal-header">
+      <div class="com-modal-title-row">
+        <span class="com-modal-icon key-icon">🔑</span>
+        <h2>Confirmar Cambio de Comisión</h2>
+      </div>
+      <button class="com-close-btn" (click)="closeOtpModal()" [disabled]="loading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="com-modal-content">
+      <p class="com-modal-subtitle">
+        Se ha enviado un código de verificación (OTP) para autorizar este cambio. Ingrésalo a continuación para
+        confirmar el nuevo valor de <strong>{{ commissionValue }}%</strong>.
+      </p>
+
+      <!-- Info Card -->
+      <div class="com-info-card otp-card">
+        <span class="com-info-pin">🔐</span>
+        <div class="com-info-text-col">
+          <h4 class="com-info-title">Autorización Requerida</h4>
+          <p class="com-info-desc">
+            Esta acción modificará la tasa de comisión cobrada a los propietarios.
+          </p>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="com-input-section">
+        <label class="com-input-label">Código OTP</label>
+        <input type="text" class="com-text-input" placeholder="Ingresa el código OTP" [(ngModel)]="otpValue"
+          [disabled]="loading" />
+      </div>
+
+      <!-- Error/Success feedback -->
+      @if (errorMessage) {
+      <div class="com-error-alert">
+        {{ errorMessage }}
+      </div>
+      }
+      @if (successMessage) {
+      <div class="com-success-alert">
+        {{ successMessage }}
+      </div>
+      }
+
+      <!-- Modal Actions -->
+      <div class="com-modal-actions">
+        <button class="com-btn-cancel" (click)="closeOtpModal()" [disabled]="loading">
+          Cancelar
+        </button>
+        <button class="com-btn-save" (click)="confirmOtp()" [disabled]="loading || !otpValue">
+          @if (loading) {
+          <span class="com-spinner"></span> Confirmando...
+          } @else {
+          <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Confirmar Cambio
+          }
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- Modal: Configurar Ciclo Semanal de Comisiones -->
+@if (showCycleModal) {
+<div class="cycle-modal-backdrop" (click)="closeCycleModal()">
+  <div class="cycle-modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="cycle-modal-header">
+      <div class="cycle-modal-title-row">
+        <div class="cycle-modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div class="cycle-header-text">
+          <h2>Configurar Ciclo Semanal de Comisiones</h2>
+          <p class="cycle-modal-subtitle">Define el período de cobro semanal y la fecha límite de pago de comisiones</p>
+        </div>
+      </div>
+      <button class="cycle-close-btn" (click)="closeCycleModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="cycle-modal-content">
+      @if (loading && !cycleConfig) {
+      <div class="cycle-modal-loading">
+        <div class="com-spinner"></div>
+        <p>Cargando configuración del ciclo...</p>
+      </div>
+      } @else if (cycleConfig) {
+      <!-- ¿Cómo funciona el ciclo semanal? -->
+      <div class="cycle-info-card">
+        <span class="info-icon">📋</span>
+        <div class="info-text-col">
+          <p class="info-title">¿Cómo funciona el ciclo semanal?</p>
+          <p class="info-desc">
+            El ciclo semanal tiene una duración de <strong>{{ cycleConfig.cycleDays || 7 }} días</strong>. Define cuándo
+            comienza el período de cobro. El ciclo termina siempre a las <strong>11:59 PM</strong> del día {{
+            cycleConfig.cycleDays || 7 }}.
+          </p>
+          <p class="info-desc mt-8">
+            La fecha límite de pago es el <strong>último día del ciclo</strong> a las <strong>11:59 PM</strong> (mismo
+            día que termina el ciclo).
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 1: Inicio del Ciclo Semanal -->
+      <div class="step-header">
+        <span class="step-number step-blue">1</span>
+        <h3>Inicio del Ciclo Semanal</h3>
+      </div>
+
+      <div class="dropdowns-row">
+        <div class="dropdown-group flex-2">
+          <label>Día de inicio</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedStartDay">
+              <option [value]="1">Lunes</option>
+              <option [value]="2">Martes</option>
+              <option [value]="3">Miércoles</option>
+              <option [value]="4">Jueves</option>
+              <option [value]="5">Viernes</option>
+              <option [value]="6">Sábado</option>
+              <option [value]="7">Domingo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="dropdown-group flex-3">
+          <label>Hora de inicio</label>
+          <div class="time-selects">
+            <div class="select-wrapper">
+              <select [(ngModel)]="selectedStartHour">
+                @for (hr of hoursList; track hr) {
+                <option [value]="+hr">{{ hr }}</option>
+                }
+              </select>
+            </div>
+            <span class="time-separator">:</span>
+            <div class="select-wrapper select-disabled">
+              <select disabled>
+                <option>00</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Cálculos Automáticos -->
+      <div class="step-header">
+        <span class="step-number step-green">2</span>
+        <h3>Cálculos Automáticos</h3>
+      </div>
+
+      <div class="calc-cards-col">
+        <div class="calc-card">
+          <span class="calc-icon">📅</span>
+          <div class="calc-text">
+            <span class="calc-label">Fin del ciclo ({{ cycleConfig.cycleDays || 7 }} días después):</span>
+            <span class="calc-value font-bold">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr }}</span>
+          </div>
+        </div>
+
+        <div class="calc-card border-red bg-red">
+          <span class="calc-icon text-red">⚠️</span>
+          <div class="calc-text text-red">
+            <span class="calc-label text-red">Fecha límite de pago (último día del ciclo):</span>
+            <span class="calc-value font-bold text-red">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr
+              }}</span>
+            <span class="calc-subtext">Los propietarios deben pagar antes de que termine el ciclo</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen de Configuración -->
+      <div class="summary-card">
+        <div class="summary-header">
+          <span class="summary-icon">📋</span>
+          <h4>Resumen de Configuración</h4>
+        </div>
+        <div class="summary-rows">
+          <div class="summary-row">
+            <span class="summary-label">Ciclo inicia:</span>
+            <span class="summary-value">{{ daysList[selectedStartDay - 1] }} a las {{ calculatedStartHourStr }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Ciclo termina:</span>
+            <span class="summary-value">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label text-red">Limite de pago:</span>
+            <span class="summary-value text-red text-bold">{{ calculatedEndDayName }} a las {{ calculatedEndHourStr
+              }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Duración:</span>
+            <span class="summary-value">{{ calculatedDurationStr }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Importante Card -->
+      <div class="important-card">
+        <span class="important-icon">⚠️</span>
+        <div class="important-text-col">
+          <p class="important-title">Importante</p>
+          <p class="important-desc">
+            Los cambios en la configuración del ciclo se aplicarán en el próximo ciclo. El ciclo actual continuará con
+            la configuración anterior.
+          </p>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Footer / Actions -->
+    <div class="cycle-modal-footer">
+      <button class="com-btn-cancel" (click)="closeCycleModal()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button class="com-btn-save" (click)="submitCycleChange()" [disabled]="loading">
+        @if (loading) {
+        <span class="com-spinner"></span> Enviando OTP...
+        } @else {
+        <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Aceptar
+        }
+      </button>
+    </div>
+  </div>
+</div>
 }
 
 <!-- Modal: Confirmar OTP Cambio de Ciclo -->
 @if (showCycleOtpModal) {
-  <div class="com-modal-backdrop" (click)="closeCycleOtpModal()">
-    <div class="com-modal-container" (click)="$event.stopPropagation()">
-      <!-- Modal Header -->
-      <div class="com-modal-header">
-        <div class="com-modal-title-row">
-          <div class="com-modal-icon key-icon">🔑</div>
-          <h2>Confirmar Cambio de Ciclo</h2>
+<div class="com-modal-backdrop" (click)="closeCycleOtpModal()">
+  <div class="com-modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="com-modal-header">
+      <div class="com-modal-title-row">
+        <div class="com-modal-icon key-icon">🔑</div>
+        <h2>Confirmar Cambio de Ciclo</h2>
+      </div>
+      <button class="com-close-btn" (click)="closeCycleOtpModal()" [disabled]="loading">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="com-modal-content">
+      <p class="com-modal-subtitle">
+        Se ha enviado un código de verificación (OTP) para autorizar este cambio. Ingrésalo a continuación para
+        confirmar los nuevos valores del ciclo de comisiones.
+      </p>
+
+      <!-- Info Card -->
+      <div class="com-info-card otp-card">
+        <span class="com-info-pin">🔐</span>
+        <div class="com-info-text-col">
+          <h4 class="com-info-title">Autorización Requerida</h4>
+          <p class="com-info-desc">
+            Esta acción modificará los días de ciclo, días límite de pago y el inicio del ciclo semanal.
+          </p>
         </div>
-        <button class="com-close-btn" (click)="closeCycleOtpModal()" [disabled]="loading">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
+      </div>
+
+      <!-- Input Area -->
+      <div class="com-input-section">
+        <label class="com-input-label">Código OTP</label>
+        <input type="text" class="com-text-input" placeholder="Ingresa el código OTP" [(ngModel)]="cycleOtpValue"
+          [disabled]="loading" />
+      </div>
+
+      <!-- Error/Success feedback -->
+      @if (errorMessage) {
+      <div class="com-error-alert">
+        {{ errorMessage }}
+      </div>
+      }
+      @if (successMessage) {
+      <div class="com-success-alert">
+        {{ successMessage }}
+      </div>
+      }
+
+      <!-- Modal Actions -->
+      <div class="com-modal-actions">
+        <button class="com-btn-cancel" (click)="closeCycleOtpModal()" [disabled]="loading">
+          Cancelar
+        </button>
+        <button class="com-btn-save" (click)="confirmCycleOtp()" [disabled]="loading || !cycleOtpValue">
+          @if (loading) {
+          <span class="com-spinner"></span> Confirmando...
+          } @else {
+          <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
+          Confirmar Cambio
+          }
         </button>
       </div>
-
-      <!-- Modal Content -->
-      <div class="com-modal-content">
-        <p class="com-modal-subtitle">
-          Se ha enviado un código de verificación (OTP) para autorizar este cambio. Ingrésalo a continuación para confirmar los nuevos valores del ciclo de comisiones.
-        </p>
-
-        <!-- Info Card -->
-        <div class="com-info-card otp-card">
-          <span class="com-info-pin">🔐</span>
-          <div class="com-info-text-col">
-            <h4 class="com-info-title">Autorización Requerida</h4>
-            <p class="com-info-desc">
-              Esta acción modificará los días de ciclo, días límite de pago y el inicio del ciclo semanal.
-            </p>
-          </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="com-input-section">
-          <label class="com-input-label">Código OTP</label>
-          <input type="text" 
-                 class="com-text-input" 
-                 placeholder="Ingresa el código OTP" 
-                 [(ngModel)]="cycleOtpValue" 
-                 [disabled]="loading" />
-        </div>
-
-        <!-- Error/Success feedback -->
-        @if (errorMessage) {
-          <div class="com-error-alert">
-            {{ errorMessage }}
-          </div>
-        }
-        @if (successMessage) {
-          <div class="com-success-alert">
-            {{ successMessage }}
-          </div>
-        }
-
-        <!-- Modal Actions -->
-        <div class="com-modal-actions">
-          <button class="com-btn-cancel" (click)="closeCycleOtpModal()" [disabled]="loading">
-            Cancelar
-          </button>
-          <button class="com-btn-save" (click)="confirmCycleOtp()" [disabled]="loading || !cycleOtpValue">
-            @if (loading) {
-              <span class="com-spinner"></span> Confirmando...
-            } @else {
-              <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              Confirmar Cambio
-            }
-          </button>
-        </div>
-      </div>
-
     </div>
-  </div>
-}
 
-
+  </div>
+</div>
+}
