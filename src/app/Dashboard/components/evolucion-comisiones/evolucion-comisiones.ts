@@ -29,19 +29,21 @@ interface MonthPoint {
 })
 export class EvolucionComisiones implements OnInit {
   // SVG chart dimensions
-  readonly svgWidth = 500;
-  readonly svgHeight = 250;
-  readonly padLeft = 65;
-  readonly padRight = 20;
+  readonly svgWidth = 520;
+  readonly svgHeight = 260;
+  readonly padLeft = 75;
+  readonly padRight = 24;
   readonly padTop = 20;
-  readonly padBottom = 30;
+  readonly padBottom = 36;
 
   months: MonthPoint[] = [];
   maxValue = 100;
   yTicks: number[] = [];
 
   // SVG path strings
-  areaPath = '';
+  areaReservasPath = '';
+  areaComisionesPath = '';
+  areaPendientesPath = '';
   reservasPath = '';
   comisionesPath = '';
   pendientesPath = '';
@@ -100,16 +102,13 @@ export class EvolucionComisiones implements OnInit {
   }
 
   processData(data: HostDebt[]) {
-    // Build the last 4 months scaffold (sorted oldest → newest)
     const last4Months = this.getLast4Months();
 
-    // Pre-seed map with 4 months all at 0
     const map = new Map<string, MonthPoint>();
     last4Months.forEach(({ key, label }) => {
       map.set(key, { label, comisiones: 0, pendientes: 0, reservas: 0 });
     });
 
-    // Only keep records from last 4 months
     const cutoff = new Date();
     cutoff.setMonth(cutoff.getMonth() - 3);
     cutoff.setDate(1);
@@ -117,28 +116,24 @@ export class EvolucionComisiones implements OnInit {
 
     data.forEach(d => {
       const date = new Date(d.cycleStart);
-      if (date < cutoff) return; // skip older months
+      if (date < cutoff) return;
 
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       if (map.has(key)) {
         const p = map.get(key)!;
         p.reservas    += d.totalIncome;
         p.comisiones  += d.paidAmount;
-        p.pendientes  += (d.commissionAmount - d.paidAmount);
+        p.pendientes  += Math.max(0, d.commissionAmount - d.paidAmount);
       }
     });
 
-    // Keep insertion order (oldest → newest)
     this.months = Array.from(map.values());
 
-    // Calculate max for Y axis
     const allValues = this.months.flatMap(m => [m.reservas, m.comisiones, m.pendientes]);
     const rawMax = Math.max(...allValues, 1);
-    // Round up to a nice number
     const magnitude = Math.pow(10, Math.floor(Math.log10(rawMax)));
     this.maxValue = Math.ceil(rawMax / magnitude) * magnitude;
 
-    // Y ticks: 8 steps
     this.yTicks = [];
     for (let i = 8; i >= 0; i--) {
       this.yTicks.push((this.maxValue / 8) * i);
@@ -147,7 +142,6 @@ export class EvolucionComisiones implements OnInit {
     this.buildPaths();
   }
 
-  /** Returns the last 4 months as { key: 'YYYY-MM', label: 'abr. 25' } */
   getLast4Months(): { key: string; label: string }[] {
     const result: { key: string; label: string }[] = [];
     const now = new Date();
@@ -160,37 +154,62 @@ export class EvolucionComisiones implements OnInit {
     return result;
   }
 
+  /** Generates a smooth cubic bezier path through a set of points */
+  private smoothPath(pts: { x: number; y: number }[]): string {
+    if (pts.length < 2) return pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+
+    let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+    for (let i = 1; i < pts.length; i++) {
+      const prev = pts[i - 1];
+      const curr = pts[i];
+      const cp1x = prev.x + (curr.x - prev.x) * 0.4;
+      const cp1y = prev.y;
+      const cp2x = curr.x - (curr.x - prev.x) * 0.4;
+      const cp2y = curr.y;
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
+    }
+    return d;
+  }
+
   buildPaths() {
     const n = this.months.length;
     if (n === 0) return;
 
     const chartW = this.svgWidth - this.padLeft - this.padRight;
     const chartH = this.svgHeight - this.padTop - this.padBottom;
+    const baseline = this.padTop + chartH;
 
     const xPos = (i: number) => this.padLeft + (i / Math.max(n - 1, 1)) * chartW;
     const yPos = (v: number) => this.padTop + chartH - (v / this.maxValue) * chartH;
 
     // Reservas (blue)
     const rPts = this.months.map((m, i) => ({ x: xPos(i), y: yPos(m.reservas) }));
-    this.reservasPath = rPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-    this.areaPath = this.reservasPath
-      + ` L ${rPts[rPts.length - 1].x.toFixed(1)} ${(this.padTop + chartH).toFixed(1)}`
-      + ` L ${rPts[0].x.toFixed(1)} ${(this.padTop + chartH).toFixed(1)} Z`;
+    this.reservasPath = this.smoothPath(rPts);
+    this.areaReservasPath = this.reservasPath
+      + ` L ${rPts[rPts.length - 1].x.toFixed(1)} ${baseline.toFixed(1)}`
+      + ` L ${rPts[0].x.toFixed(1)} ${baseline.toFixed(1)} Z`;
     this.reservasDots = rPts.map(p => ({ cx: p.x, cy: p.y }));
 
     // Comisiones (green)
     const cPts = this.months.map((m, i) => ({ x: xPos(i), y: yPos(m.comisiones) }));
-    this.comisionesPath = cPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    this.comisionesPath = this.smoothPath(cPts);
+    this.areaComisionesPath = this.comisionesPath
+      + ` L ${cPts[cPts.length - 1].x.toFixed(1)} ${baseline.toFixed(1)}`
+      + ` L ${cPts[0].x.toFixed(1)} ${baseline.toFixed(1)} Z`;
     this.comisionesDots = cPts.map(p => ({ cx: p.x, cy: p.y }));
 
     // Pendientes (orange)
     const pPts = this.months.map((m, i) => ({ x: xPos(i), y: yPos(m.pendientes) }));
-    this.pendientesPath = pPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    this.pendientesPath = this.smoothPath(pPts);
+    this.areaPendientesPath = this.pendientesPath
+      + ` L ${pPts[pPts.length - 1].x.toFixed(1)} ${baseline.toFixed(1)}`
+      + ` L ${pPts[0].x.toFixed(1)} ${baseline.toFixed(1)} Z`;
     this.pendientesDots = pPts.map(p => ({ cx: p.x, cy: p.y }));
   }
 
   yLabel(v: number): string {
-    return `S/ ${v.toFixed(2)}`;
+    if (v >= 1000) return `S/ ${(v / 1000).toFixed(1)}k`;
+    return `S/ ${v.toFixed(0)}`;
   }
 
   yLabelX(v: number): number {

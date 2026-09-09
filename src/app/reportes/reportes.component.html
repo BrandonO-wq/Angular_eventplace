@@ -89,7 +89,7 @@
   <!-- Main Charts & Content -->
   <div class="reports-content-body">
 
-    <!-- Error State when /venues/report returns 500
+    <!-- Error State when /venues/report returns 500 -->
     @if (errorVenues) {
       <div class="error-state-card">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="40" height="40" style="color:#ef4444; margin-bottom:12px">
@@ -107,7 +107,7 @@
           Reintentar
         </button>
       </div>
-    } -->
+    }
 
     <!-- Stats Row -->
     <app-dashboard-stats [filteredVenues]="filteredVenues" [filteredBookings]="filteredBookings"></app-dashboard-stats>

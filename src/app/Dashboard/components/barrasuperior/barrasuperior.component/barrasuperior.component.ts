@@ -24,6 +24,8 @@ export class BarrasuperiorComponent implements OnInit {
   // Cycle config variables
   showCycleModal = false;
   cycleConfig: any = null;
+  loadingCycle = false;
+  cycleErrorMessage = '';
   selectedStartDay: number = 1;
   selectedStartHour: number = 0;
   daysList = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -182,6 +184,8 @@ export class BarrasuperiorComponent implements OnInit {
 
   openCycleModal() {
     this.showCycleModal = true;
+    this.cycleConfig = null;
+    this.cycleErrorMessage = '';
     this.fetchCycleConfig();
   }
 
@@ -193,7 +197,8 @@ export class BarrasuperiorComponent implements OnInit {
     const token = this.getToken();
     if (!token) return;
 
-    this.loading = true;
+    this.loadingCycle = true;
+    this.cycleErrorMessage = '';
     this.http.get<any>(`${environment.apiUrl}/host-debts/commission/cycle-config`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -201,14 +206,15 @@ export class BarrasuperiorComponent implements OnInit {
       }
     }).subscribe({
       next: (res) => {
-        this.loading = false;
+        this.loadingCycle = false;
         this.cycleConfig = res;
         this.selectedStartDay = res.startDayOfWeek || 1;
         this.selectedStartHour = res.startHour || 0;
       },
       error: (err) => {
-        this.loading = false;
+        this.loadingCycle = false;
         console.error('Error fetching cycle config:', err);
+        this.cycleErrorMessage = err?.error?.message || 'No se pudo cargar la configuración del ciclo. Intente nuevamente.';
       }
     });
   }
@@ -238,8 +244,8 @@ export class BarrasuperiorComponent implements OnInit {
   }
 
   submitCycleChange() {
-    this.loading = true;
-    this.errorMessage = '';
+    this.loadingCycle = true;
+    this.cycleErrorMessage = '';
     const token = this.getToken();
 
     this.http.post(`${environment.apiUrl}/host-debts/commission/request-cycle-change`, {}, {
@@ -249,19 +255,19 @@ export class BarrasuperiorComponent implements OnInit {
       }
     }).subscribe({
       next: () => {
-        this.loading = false;
+        this.loadingCycle = false;
         this.showCycleModal = false;
         this.showCycleOtpModal = true;
         this.cycleOtpValue = '';
-        this.errorMessage = '';
+        this.cycleErrorMessage = '';
       },
       error: (err) => {
-        this.loading = false;
+        this.loadingCycle = false;
         console.error('Error requesting cycle config change:', err);
         if (err?.error?.message) {
-          this.errorMessage = err.error.message;
+          this.cycleErrorMessage = err.error.message;
         } else {
-          this.errorMessage = 'No se pudo iniciar el proceso de cambio de ciclo. Intente nuevamente.';
+          this.cycleErrorMessage = 'No se pudo iniciar el proceso de cambio de ciclo. Intente nuevamente.';
         }
       }
     });

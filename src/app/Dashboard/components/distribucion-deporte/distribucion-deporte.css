@@ -10,7 +10,7 @@
 }
 
 .card-title {
-  margin: 0 0 24px 0;
+  margin: 0 0 20px 0;
   font-size: 18px;
   font-weight: 700;
   color: #1f2937;
@@ -18,20 +18,93 @@
 
 .chart-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   flex-grow: 1;
 }
 
 .pie-chart {
-  width: 200px;
-  height: 200px;
-  margin-bottom: 16px;
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  overflow: visible;
 }
 
-.chart-label {
-  color: #6366f1;
-  font-weight: 500;
+.pie-slice {
+  transition: opacity 0.2s;
+}
+
+.pie-slice:hover {
+  opacity: 0.82;
+  cursor: pointer;
+}
+
+.pie-label {
+  font-size: 9.5px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.pie-line {
+  opacity: 0.75;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-pct {
+  font-weight: 600;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+/* Loading */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 160px;
+  color: #9ca3af;
   font-size: 14px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

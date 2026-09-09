@@ -85,10 +85,10 @@
 
       <!-- Input Area -->
       <div class="com-input-section">
-        <label class="com-input-label">Porcentaje de Comisión (%)</label>
+        <label class="com-input-label" for="commission-percentage-input">Porcentaje de Comisión (%)</label>
         <div class="com-input-row">
           <div class="com-input-wrapper">
-            <input type="number" class="com-number-input" [(ngModel)]="commissionValue" min="0" max="100" step="0.1"
+            <input id="commission-percentage-input" type="number" class="com-number-input" [(ngModel)]="commissionValue" min="0" max="100" step="0.1"
               [disabled]="loading" />
           </div>
           <div class="com-preview-value">
@@ -171,8 +171,8 @@
 
       <!-- Input Area -->
       <div class="com-input-section">
-        <label class="com-input-label">Código OTP</label>
-        <input type="text" class="com-text-input" placeholder="Ingresa el código OTP" [(ngModel)]="otpValue"
+        <label class="com-input-label" for="commission-otp-input">Código OTP</label>
+        <input id="commission-otp-input" type="text" class="com-text-input" placeholder="Ingresa el código OTP" [(ngModel)]="otpValue"
           [disabled]="loading" />
       </div>
 
@@ -241,10 +241,15 @@
 
     <!-- Content -->
     <div class="cycle-modal-content">
-      @if (loading && !cycleConfig) {
+      @if (loadingCycle) {
       <div class="cycle-modal-loading">
         <div class="com-spinner"></div>
         <p>Cargando configuración del ciclo...</p>
+      </div>
+      } @else if (cycleErrorMessage && !cycleConfig) {
+      <div class="cycle-modal-loading">
+        <p style="color:#e53e3e; margin-bottom:12px;">{{ cycleErrorMessage }}</p>
+        <button class="com-btn-save" style="padding:8px 20px;" (click)="fetchCycleConfig()">Reintentar</button>
       </div>
       } @else if (cycleConfig) {
       <!-- ¿Cómo funciona el ciclo semanal? -->
@@ -272,9 +277,9 @@
 
       <div class="dropdowns-row">
         <div class="dropdown-group flex-2">
-          <label>Día de inicio</label>
+          <label for="cycle-start-day-select">Día de inicio</label>
           <div class="select-wrapper">
-            <select [(ngModel)]="selectedStartDay">
+            <select id="cycle-start-day-select" [(ngModel)]="selectedStartDay">
               <option [value]="1">Lunes</option>
               <option [value]="2">Martes</option>
               <option [value]="3">Miércoles</option>
@@ -287,10 +292,10 @@
         </div>
 
         <div class="dropdown-group flex-3">
-          <label>Hora de inicio</label>
+          <label for="cycle-start-hour-select">Hora de inicio</label>
           <div class="time-selects">
             <div class="select-wrapper">
-              <select [(ngModel)]="selectedStartHour">
+              <select id="cycle-start-hour-select" [(ngModel)]="selectedStartHour">
                 @for (hr of hoursList; track hr) {
                 <option [value]="+hr">{{ hr }}</option>
                 }
@@ -375,11 +380,11 @@
 
     <!-- Footer / Actions -->
     <div class="cycle-modal-footer">
-      <button class="com-btn-cancel" (click)="closeCycleModal()" [disabled]="loading">
+      <button class="com-btn-cancel" (click)="closeCycleModal()" [disabled]="loadingCycle">
         Cancelar
       </button>
-      <button class="com-btn-save" (click)="submitCycleChange()" [disabled]="loading">
-        @if (loading) {
+      <button class="com-btn-save" (click)="submitCycleChange()" [disabled]="loadingCycle || !cycleConfig">
+        @if (loadingCycle) {
         <span class="com-spinner"></span> Enviando OTP...
         } @else {
         <svg class="com-btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -432,8 +437,8 @@
 
       <!-- Input Area -->
       <div class="com-input-section">
-        <label class="com-input-label">Código OTP</label>
-        <input type="text" class="com-text-input" placeholder="Ingresa el código OTP" [(ngModel)]="cycleOtpValue"
+        <label class="com-input-label" for="cycle-otp-input">Código OTP</label>
+        <input id="cycle-otp-input" type="text" class="com-text-input" placeholder="Ingresa el código OTP" [(ngModel)]="cycleOtpValue"
           [disabled]="loading" />
       </div>
 

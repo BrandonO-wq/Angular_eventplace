@@ -534,7 +534,7 @@ export class ComisionesComponent implements OnInit {
     // Fetch host details
     this.http.get<any>(`${environment.apiUrl}/host-detail/${hostId}`, { headers }).subscribe({
       next: (details) => {
-        this.selectedOwnerDetails = details;
+        this.selectedOwnerDetails = details || {};
         this.checkLoadingState();
       },
       error: (err) => {

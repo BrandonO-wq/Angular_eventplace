@@ -1,11 +1,54 @@
 <div class="card">
   <h3 class="card-title">Distribución por Salones</h3>
 
-  <div class="chart-container">
-    <svg viewBox="0 0 200 200" class="pie-chart">
-      <circle cx="100" cy="100" r="80" fill="#6366f1" />
-      <line x1="100" y1="20" x2="100" y2="100" stroke="white" stroke-width="2" />
-    </svg>
-    <div class="chart-label">todos: 100%</div>
-  </div>
+  @if (loading) {
+    <div class="empty-state">
+      <div class="spinner"></div>
+    </div>
+  } @else if (slices.length === 0) {
+    <div class="empty-state">Sin datos disponibles.</div>
+  } @else {
+    <div class="chart-container">
+      <svg viewBox="0 0 220 220" class="pie-chart">
+        <!-- Pie slices -->
+        @for (s of slices; track s.label) {
+          <path
+            [attr.d]="s.path"
+            [attr.fill]="s.color"
+            class="pie-slice"
+          />
+        }
+
+        <!-- Label connector lines and text -->
+        @for (s of slices; track s.label) {
+          <polyline
+            [attr.points]="s.lineX1 + ',' + s.lineY1 + ' ' + s.lineX2 + ',' + s.lineY2 + ' ' + s.lineX3 + ',' + s.lineY2"
+            fill="none"
+            [attr.stroke]="s.color"
+            stroke-width="1.2"
+            class="pie-line"
+          />
+          <text
+            [attr.x]="s.labelX"
+            [attr.y]="s.lineY2"
+            [attr.text-anchor]="s.labelX >= 110 ? 'start' : 'end'"
+            [attr.fill]="s.color"
+            class="pie-label"
+            dominant-baseline="middle"
+          >{{ s.label }}: {{ s.percent }}%</text>
+        }
+      </svg>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      @for (s of slices; track s.label) {
+        <div class="legend-item">
+          <span class="legend-dot" [style.background]="s.color"></span>
+          <span class="legend-text">{{ s.label }}</span>
+          <span class="legend-pct">{{ s.percent }}%</span>
+        </div>
+      }
+    </div>
+  }
 </div>
