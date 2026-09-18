@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID, OnInit } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -37,7 +37,8 @@ export class BarrasuperiorComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -64,9 +65,11 @@ export class BarrasuperiorComponent implements OnInit {
             this.commissionValue = parsedVal;
           }
         }
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching current commission percentage:', err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -90,23 +93,27 @@ export class BarrasuperiorComponent implements OnInit {
     this.fetchCurrentCommission();
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
   }
 
   closeCommissionModal() {
     if (!this.loading) {
       this.showCommissionModal = false;
       this.errorMessage = '';
+      this.cdr.detectChanges();
     }
   }
 
   submitCommissionChange() {
     if (this.commissionValue === null || this.commissionValue < 0 || this.commissionValue > 100) {
       this.errorMessage = 'Ingresa un valor entre 0 y 100';
+      this.cdr.detectChanges();
       return;
     }
 
     this.loading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
     const token = this.getToken();
 
     this.http.post(`${environment.apiUrl}/host-debts/commission/request-change`, {}, {
@@ -121,6 +128,7 @@ export class BarrasuperiorComponent implements OnInit {
         this.showOtpModal = true;
         this.otpValue = '';
         this.errorMessage = '';
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
@@ -130,6 +138,7 @@ export class BarrasuperiorComponent implements OnInit {
         } else {
           this.errorMessage = 'No se pudo iniciar el proceso de cambio de comisión. Intente nuevamente.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
@@ -137,12 +146,14 @@ export class BarrasuperiorComponent implements OnInit {
   confirmOtp() {
     if (!this.otpValue) {
       this.errorMessage = 'Por favor, ingrese el código OTP.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
     const token = this.getToken();
     const decimalValue = (this.commissionValue || 0) / 100;
 
@@ -158,8 +169,11 @@ export class BarrasuperiorComponent implements OnInit {
       next: () => {
         this.loading = false;
         this.successMessage = '¡Configuración guardada con éxito!';
+        this.cdr.detectChanges();
         setTimeout(() => {
           this.closeOtpModal();
+          this.fetchCurrentCommission();
+          this.cdr.detectChanges();
         }, 2000);
       },
       error: (err) => {
@@ -170,6 +184,7 @@ export class BarrasuperiorComponent implements OnInit {
         } else {
           this.errorMessage = 'El código OTP es incorrecto o ha expirado. Intente nuevamente.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
@@ -179,6 +194,7 @@ export class BarrasuperiorComponent implements OnInit {
       this.showOtpModal = false;
       this.errorMessage = '';
       this.successMessage = '';
+      this.cdr.detectChanges();
     }
   }
 
@@ -187,10 +203,12 @@ export class BarrasuperiorComponent implements OnInit {
     this.cycleConfig = null;
     this.cycleErrorMessage = '';
     this.fetchCycleConfig();
+    this.cdr.detectChanges();
   }
 
   closeCycleModal() {
     this.showCycleModal = false;
+    this.cdr.detectChanges();
   }
 
   fetchCycleConfig() {
@@ -199,6 +217,7 @@ export class BarrasuperiorComponent implements OnInit {
 
     this.loadingCycle = true;
     this.cycleErrorMessage = '';
+    this.cdr.detectChanges();
     this.http.get<any>(`${environment.apiUrl}/host-debts/commission/cycle-config`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -210,11 +229,13 @@ export class BarrasuperiorComponent implements OnInit {
         this.cycleConfig = res;
         this.selectedStartDay = res.startDayOfWeek || 1;
         this.selectedStartHour = res.startHour || 0;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loadingCycle = false;
         console.error('Error fetching cycle config:', err);
         this.cycleErrorMessage = err?.error?.message || 'No se pudo cargar la configuración del ciclo. Intente nuevamente.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -246,6 +267,7 @@ export class BarrasuperiorComponent implements OnInit {
   submitCycleChange() {
     this.loadingCycle = true;
     this.cycleErrorMessage = '';
+    this.cdr.detectChanges();
     const token = this.getToken();
 
     this.http.post(`${environment.apiUrl}/host-debts/commission/request-cycle-change`, {}, {
@@ -260,6 +282,7 @@ export class BarrasuperiorComponent implements OnInit {
         this.showCycleOtpModal = true;
         this.cycleOtpValue = '';
         this.cycleErrorMessage = '';
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loadingCycle = false;
@@ -269,6 +292,7 @@ export class BarrasuperiorComponent implements OnInit {
         } else {
           this.cycleErrorMessage = 'No se pudo iniciar el proceso de cambio de ciclo. Intente nuevamente.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
@@ -276,12 +300,14 @@ export class BarrasuperiorComponent implements OnInit {
   confirmCycleOtp() {
     if (!this.cycleOtpValue) {
       this.errorMessage = 'Por favor, ingrese el código OTP.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
     const token = this.getToken();
 
     const payload = {
@@ -301,8 +327,10 @@ export class BarrasuperiorComponent implements OnInit {
       next: () => {
         this.loading = false;
         this.successMessage = '¡Configuración de ciclo guardada con éxito!';
+        this.cdr.detectChanges();
         setTimeout(() => {
           this.closeCycleOtpModal();
+          this.cdr.detectChanges();
         }, 2000);
       },
       error: (err) => {
@@ -313,6 +341,7 @@ export class BarrasuperiorComponent implements OnInit {
         } else {
           this.errorMessage = 'El código OTP es incorrecto o ha expirado. Intente nuevamente.';
         }
+        this.cdr.detectChanges();
       }
     });
   }
@@ -322,6 +351,7 @@ export class BarrasuperiorComponent implements OnInit {
       this.showCycleOtpModal = false;
       this.errorMessage = '';
       this.successMessage = '';
+      this.cdr.detectChanges();
     }
   }
 }
