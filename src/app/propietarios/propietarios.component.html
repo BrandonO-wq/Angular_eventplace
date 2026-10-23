@@ -312,6 +312,20 @@
       <div class="spinner"></div>
       <p>Cargando detalles del propietario...</p>
     </div>
+    } @else if (ownerModalError && !selectedOwnerDetails) {
+    <!-- Error State -->
+    <div class="owner-modal-loading">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" width="40" height="40" style="margin-bottom:12px">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <p style="color:#ef4444; font-weight:600;">{{ ownerModalError }}</p>
+      <p style="color:#888; font-size:0.85rem; margin-top:4px;">Verifica que el servidor esté activo e intenta de nuevo.</p>
+      <button class="btn-reminder" style="margin-top:16px;" (click)="openOwnerModal({hostId: currentHostId!, hostName: '', registrationDate: '', email: '', phone: '', venuesCount: 0, totalIncomeLastPeriod: 0, commissionLastPeriod: 0, deadlineLastPeriod: null, statusLastPeriod: null})">
+        Reintentar
+      </button>
+    </div>
     } @else if (selectedOwnerDetails) {
     <!-- Content State -->
     <div class="owner-modal-content">

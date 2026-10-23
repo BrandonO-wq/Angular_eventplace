@@ -13,7 +13,7 @@ import { TopSalonesComponent } from '../Dashboard/components/top-salones/top-sal
 import { TopReservadas } from '../Dashboard/components/top-reservadas/top-reservadas';
 import { DeudaVencida } from '../Dashboard/components/deuda-vencida/deuda-vencida';
 import { EvolucionComisiones } from '../Dashboard/components/evolucion-comisiones/evolucion-comisiones';
-import { DistribucionDeporte } from '../Dashboard/components/distribucion-deporte/distribucion-deporte';
+import { DistribucionEventos } from '../Dashboard/components/distribucion-eventos/distribucion-eventos';
 import { DashboardStats } from '../Dashboard/components/dashboard-stats/dashboard-stats';
 import { CrecimientoPlataforma } from '../Dashboard/components/crecimiento-plataforma/crecimiento-plataforma';
 
@@ -27,7 +27,7 @@ import { CrecimientoPlataforma } from '../Dashboard/components/crecimiento-plata
     TopReservadas,
     DeudaVencida,
     EvolucionComisiones,
-    DistribucionDeporte,
+    DistribucionEventos,
     DashboardStats,
     CrecimientoPlataforma
   ],
@@ -53,9 +53,9 @@ export class ReportesComponent implements OnInit {
   filteredVenues: any[] | null = null;
   filteredBookings: any[] = [];
 
-  // Date Range Selection (Mock/Interactivo)
+  // Date Range Selection (Dinámico y reactivo)
   activeRange: string = 'trimestre';
-  dateRangeStr: string = '10 de abril de 2026 - 8 de julio de 2026';
+  dateRangeStr: string = '';
 
   loading = true;
   errorVenues = false;   // true si /venues/report devuelve error
@@ -69,6 +69,7 @@ export class ReportesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.setDateRange(this.activeRange);
     if (isPlatformBrowser(this.platformId)) {
       this.loadInitialData();
     }
@@ -91,7 +92,7 @@ export class ReportesComponent implements OnInit {
     });
 
     // Fetch venues report
-    this.http.get<any[]>(`${environment.apiUrl}/venues/report`, {
+    this.http.get<any[]>(`${environment.apiUrl}/host-debts/venues/report`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
@@ -166,6 +167,54 @@ export class ReportesComponent implements OnInit {
     this.applyFilters();
   }
 
+  formatDateSpanish(d: Date): string {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ];
+    return `${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`;
+  }
+
+  getCurrentDateRange(range: string): { start: Date; end: Date; label: string } {
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    if (range === 'semana') {
+      start.setDate(end.getDate() - 6);
+    } else if (range === 'mes') {
+      start.setMonth(end.getMonth() - 1);
+    } else if (range === 'trimestre') {
+      start.setMonth(end.getMonth() - 3);
+    } else if (range === 'ano') {
+      start.setFullYear(end.getFullYear() - 1);
+    }
+
+    const label = `${this.formatDateSpanish(start)} - ${this.formatDateSpanish(end)}`;
+    return { start, end, label };
+  }
+
+  private parseBookingDate(b: any): Date | null {
+    const raw = b.bookingDate || b.createdAt || b.date;
+    if (!raw) return null;
+    if (typeof raw === 'string') {
+      const datePart = raw.split('T')[0];
+      const parts = datePart.split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+          return new Date(year, month, day, 12, 0, 0);
+        }
+      }
+    }
+    const d = new Date(raw);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   applyFilters() {
     let tempVenues = [...this.allVenues];
 
@@ -181,13 +230,20 @@ export class ReportesComponent implements OnInit {
     const isFilterActive = !!(this.selectedDepartamento || this.selectedProvincia || this.selectedDistrito);
     this.filteredVenues = isFilterActive ? tempVenues : null;
 
-    // Filter bookings based on filtered venues
-    if (isFilterActive) {
-      const allowedVenueIds = new Set(tempVenues.map(v => v.venueId));
-      this.filteredBookings = this.allBookings.filter(b => allowedVenueIds.has(b.venueId));
-    } else {
-      this.filteredBookings = [...this.allBookings];
-    }
+    // Filter bookings based on filtered venues and active date range
+    const { start, end } = this.getCurrentDateRange(this.activeRange);
+    const allowedVenueIds = isFilterActive ? new Set(tempVenues.map(v => v.venueId)) : null;
+
+    this.filteredBookings = this.allBookings.filter(b => {
+      if (allowedVenueIds && !allowedVenueIds.has(b.venueId)) {
+        return false;
+      }
+      const bDate = this.parseBookingDate(b);
+      if (bDate) {
+        return bDate >= start && bDate <= end;
+      }
+      return true;
+    });
 
     this.loading = false;
     this.cdr.detectChanges();
@@ -202,19 +258,12 @@ export class ReportesComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Date Range Selector logic (Mock/Interactivo)
+  // Date Range Selector logic (Calculado dinámicamente)
   setDateRange(range: string) {
     this.activeRange = range;
-    if (range === 'semana') {
-      this.dateRangeStr = '2 de julio de 2026 - 8 de julio de 2026';
-    } else if (range === 'mes') {
-      this.dateRangeStr = '8 de junio de 2026 - 8 de julio de 2026';
-    } else if (range === 'trimestre') {
-      this.dateRangeStr = '10 de abril de 2026 - 8 de julio de 2026';
-    } else if (range === 'ano') {
-      this.dateRangeStr = '8 de julio de 2025 - 8 de julio de 2026';
-    }
-    this.cdr.detectChanges();
+    const { label } = this.getCurrentDateRange(range);
+    this.dateRangeStr = label;
+    this.applyFilters();
   }
 
   get selectedLocationName(): string {
@@ -294,6 +343,35 @@ export class ReportesComponent implements OnInit {
       return;
     }
 
+    // Filter bookings within each venue by active date range
+    const { start, end } = this.getCurrentDateRange(this.activeRange);
+
+    const venuesWithFilteredBookings = filteredData.map(venue => {
+      const bookingsInRange = (venue.bookings || []).filter((b: any) => {
+        const bDate = this.parseBookingDate(b);
+        if (!bDate) return true;
+        return bDate >= start && bDate <= end;
+      });
+
+      const totalIncome = bookingsInRange.reduce((sum: number, b: any) => sum + parseFloat(b.totalAmount || 0), 0);
+      const totalCommissions = bookingsInRange.reduce((sum: number, b: any) => sum + parseFloat(b.commission || 0), 0);
+      const totalEarnings = bookingsInRange.reduce((sum: number, b: any) => sum + parseFloat(b.earnings || 0), 0);
+
+      return {
+        ...venue,
+        bookings: bookingsInRange,
+        bookingsCount: bookingsInRange.length,
+        totalIncome,
+        totalCommissions,
+        totalEarnings
+      };
+    });
+
+    // If there are venues with bookings in this period, show those; otherwise show filtered venues with 0 bookings
+    const venuesToExport = venuesWithFilteredBookings.some(v => v.bookingsCount > 0)
+      ? venuesWithFilteredBookings.filter(v => v.bookingsCount > 0)
+      : venuesWithFilteredBookings;
+
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -303,7 +381,7 @@ export class ReportesComponent implements OnInit {
     const formatDateTime = (dateStr: string) => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
-      return date.toLocaleString('es-PE', { hour12: true });
+      return isNaN(date.getTime()) ? dateStr : date.toLocaleString('es-PE', { hour12: true });
     };
 
     const formatDate = (dateStr: string) => {
@@ -315,7 +393,12 @@ export class ReportesComponent implements OnInit {
       return dateStr;
     };
 
-    filteredData.forEach((venue, index) => {
+    // Global location label in header: reflects user filter or "TODAS LAS UBICACIONES"
+    const globalLocationLabel = this.selectedLocationName
+      ? this.selectedLocationName.toUpperCase()
+      : 'TODAS LAS UBICACIONES';
+
+    venuesToExport.forEach((venue, index) => {
       if (index > 0) {
         doc.addPage();
       }
@@ -332,33 +415,49 @@ export class ReportesComponent implements OnInit {
       doc.setFont('helvetica', 'normal');
       doc.text(`Período: ${this.dateRangeStr}`, 105, 27, { align: 'center' });
 
-      // Location
+      // Global Location Filter
       doc.setTextColor(37, 99, 235); // #2563eb
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Ubicación: ${venue.ubigeoText || 'N/A'}`, 105, 34, { align: 'center' });
+      doc.text(`Ubicación: ${globalLocationLabel}`, 105, 34, { align: 'center' });
 
       // Owner & Venue Info
       doc.setTextColor(15, 23, 42); // #0f172a
-      doc.setFontSize(13);
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(`Propietario: ${venue.ownerName || 'N/A'} (${venue.ownerEmail || 'N/A'})`, 15, 47);
+      doc.text(`Propietario: ${venue.ownerName || 'N/A'} (${venue.ownerEmail || 'N/A'})`, 15, 45);
       
       doc.setTextColor(29, 78, 216); // #1d4ed8
       doc.setFont('helvetica', 'bold');
-      doc.text(`Salón: ${venue.venueName || 'N/A'}`, 15, 54);
+      doc.text(`Salón: ${venue.venueName || 'N/A'}`, 15, 51);
+
+      doc.setTextColor(100, 116, 139); // #64748b
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Ubicación del Salón: ${venue.ubigeoText || 'N/A'}`, 15, 57);
 
       // Bookings Table
       const tableHeaders = ['Cliente', 'F. Creación', 'F. Reserva', 'Horario', 'Ingreso', 'Comisión', 'Ganancia'];
-      const tableRows = (venue.bookings || []).map((b: any) => [
-        b.clientName || 'N/A',
-        formatDateTime(b.createdAt),
-        formatDate(b.bookingDate),
-        b.bookingHours || 'N/A',
-        `S/ ${parseFloat(b.totalAmount || 0).toFixed(2)}`,
-        `S/ ${parseFloat(b.commission || 0).toFixed(2)}`,
-        `S/ ${parseFloat(b.earnings || 0).toFixed(2)}`
-      ]);
+      
+      let tableRows: any[] = [];
+      if (venue.bookings && venue.bookings.length > 0) {
+        tableRows = venue.bookings.map((b: any) => [
+          b.clientName || 'N/A',
+          formatDateTime(b.createdAt),
+          formatDate(b.bookingDate),
+          b.bookingHours || 'N/A',
+          `S/ ${parseFloat(b.totalAmount || 0).toFixed(2)}`,
+          `S/ ${parseFloat(b.commission || 0).toFixed(2)}`,
+          `S/ ${parseFloat(b.earnings || 0).toFixed(2)}`
+        ]);
+      } else {
+        tableRows = [[
+          { content: 'No se registraron reservas en este período', colSpan: 4, styles: { halign: 'center', textColor: [100, 116, 139] } },
+          'S/ 0.00',
+          'S/ 0.00',
+          'S/ 0.00'
+        ]];
+      }
 
       const tableFoot = [[
         'Total',
@@ -371,7 +470,7 @@ export class ReportesComponent implements OnInit {
       ]];
 
       autoTable(doc, {
-        startY: 60,
+        startY: 62,
         head: [tableHeaders],
         body: tableRows,
         foot: tableFoot,
@@ -505,10 +604,13 @@ export class ReportesComponent implements OnInit {
       return;
     }
 
+    // Filter bookings within each venue by active date range
+    const { start, end } = this.getCurrentDateRange(this.activeRange);
+
     const formatDateTime = (dateStr: string) => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
-      return date.toLocaleString('es-PE', { hour12: true });
+      return isNaN(date.getTime()) ? dateStr : date.toLocaleString('es-PE', { hour12: true });
     };
 
     const formatDate = (dateStr: string) => {
@@ -520,14 +622,24 @@ export class ReportesComponent implements OnInit {
       return dateStr;
     };
 
+    const globalLocationLabel = this.selectedLocationName
+      ? this.selectedLocationName.toUpperCase()
+      : 'TODAS LAS UBICACIONES';
+
     const rows: any[] = [];
     
-    // Header Row
+    // Header & Filter Info
+    rows.push(['REPORTE GLOBAL DE ESTADÍSTICAS Y RESERVAS']);
+    rows.push(['Período:', this.dateRangeStr]);
+    rows.push(['Filtro de Ubicación:', globalLocationLabel]);
+    rows.push([]);
+
+    // Table Header Row
     rows.push([
       'Propietario',
       'Correo Propietario',
       'Salón',
-      'Ubicación',
+      'Ubicación del Salón',
       'Cliente',
       'F. Creación',
       'F. Reserva',
@@ -540,9 +652,16 @@ export class ReportesComponent implements OnInit {
     let totalIncomeSum = 0;
     let totalCommissionsSum = 0;
     let totalEarningsSum = 0;
+    let totalBookingsCount = 0;
 
     filteredData.forEach(venue => {
-      (venue.bookings || []).forEach((b: any) => {
+      const bookingsInRange = (venue.bookings || []).filter((b: any) => {
+        const bDate = this.parseBookingDate(b);
+        if (!bDate) return true;
+        return bDate >= start && bDate <= end;
+      });
+
+      bookingsInRange.forEach((b: any) => {
         const income = parseFloat(b.totalAmount || 0);
         const commission = parseFloat(b.commission || 0);
         const earnings = parseFloat(b.earnings || 0);
@@ -550,6 +669,7 @@ export class ReportesComponent implements OnInit {
         totalIncomeSum += income;
         totalCommissionsSum += commission;
         totalEarningsSum += earnings;
+        totalBookingsCount++;
 
         rows.push([
           venue.ownerName || 'N/A',
@@ -576,7 +696,7 @@ export class ReportesComponent implements OnInit {
       '',
       '',
       '',
-      '',
+      `${totalBookingsCount} reservas`,
       '',
       '',
       '',
@@ -592,7 +712,7 @@ export class ReportesComponent implements OnInit {
       { wch: 22 }, // Propietario
       { wch: 28 }, // Correo Propietario
       { wch: 22 }, // Salón
-      { wch: 28 }, // Ubicación
+      { wch: 28 }, // Ubicación del Salón
       { wch: 22 }, // Cliente
       { wch: 22 }, // F. Creación
       { wch: 14 }, // F. Reserva

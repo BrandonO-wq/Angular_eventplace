@@ -1,0 +1,151 @@
+.card {
+  background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.08), 0 1px 4px rgba(0,0,0,0.05);
+  padding: 24px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(168, 85, 247, 0.1);
+}
+
+/* Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f2937;
+  font-family: 'Inter', sans-serif;
+}
+
+.card-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: white;
+  border-radius: 20px;
+  padding: 3px 10px;
+  letter-spacing: 0.02em;
+}
+
+/* Chart */
+.chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.pie-chart {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  overflow: visible;
+}
+
+.pie-slice {
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+.pie-slice:hover {
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+  cursor: pointer;
+}
+
+.pie-label {
+  font-size: 9.5px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.pie-line {
+  opacity: 0.7;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.legend-count {
+  font-size: 11px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.legend-pct {
+  font-weight: 700;
+  color: #6b7280;
+  flex-shrink: 0;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* States */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 160px;
+  color: #9ca3af;
+  font-size: 14px;
+  gap: 8px;
+}
+
+.error-state p {
+  color: #ef4444;
+  font-size: 13px;
+  margin: 0;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #ede9fe;
+  border-top-color: #a855f7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

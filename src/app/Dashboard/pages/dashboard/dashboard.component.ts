@@ -4,7 +4,7 @@ import { TopSalonesComponent } from '../../components/top-salones/top-salones.co
 import { TopReservadas } from '../../components/top-reservadas/top-reservadas';
 import { DeudaVencida } from '../../components/deuda-vencida/deuda-vencida';
 import { EvolucionComisiones } from '../../components/evolucion-comisiones/evolucion-comisiones';
-import { DistribucionDeporte } from '../../components/distribucion-deporte/distribucion-deporte';
+import { DistribucionEventos } from '../../components/distribucion-eventos/distribucion-eventos';
 import { CrecimientoPlataforma } from '../../components/crecimiento-plataforma/crecimiento-plataforma';
 import { DashboardStats } from '../../components/dashboard-stats/dashboard-stats';
 import { HttpClient } from '@angular/common/http';
@@ -19,7 +19,7 @@ import { environment } from '../../../Enviroments/Enviroment';
     TopReservadas,
     DeudaVencida,
     EvolucionComisiones,
-    DistribucionDeporte,
+    DistribucionEventos,
     DashboardStats,
     CrecimientoPlataforma
   ],

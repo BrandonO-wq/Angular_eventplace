@@ -1,0 +1,67 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Distribución por Tipo de Evento</h3>
+    <span class="card-badge">Reservas</span>
+  </div>
+
+  @if (loading) {
+    <div class="empty-state">
+      <div class="spinner"></div>
+    </div>
+  } @else if (errorMsg) {
+    <div class="empty-state error-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" width="32" height="32">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <p>{{ errorMsg }}</p>
+    </div>
+  } @else if (slices.length === 0) {
+    <div class="empty-state">Sin datos disponibles.</div>
+  } @else {
+    <div class="chart-container">
+      <svg viewBox="0 0 220 220" class="pie-chart">
+        <!-- Pie slices -->
+        @for (s of slices; track s.label) {
+          <path
+            [attr.d]="s.path"
+            [attr.fill]="s.color"
+            class="pie-slice"
+          />
+        }
+
+        <!-- Label connector lines and text -->
+        @for (s of slices; track s.label) {
+          <polyline
+            [attr.points]="s.lineX1 + ',' + s.lineY1 + ' ' + s.lineX2 + ',' + s.lineY2 + ' ' + s.lineX3 + ',' + s.lineY2"
+            fill="none"
+            [attr.stroke]="s.color"
+            stroke-width="1.2"
+            class="pie-line"
+          />
+          <text
+            [attr.x]="s.labelX"
+            [attr.y]="s.lineY2"
+            [attr.text-anchor]="s.labelX >= 110 ? 'start' : 'end'"
+            [attr.fill]="s.color"
+            class="pie-label"
+            dominant-baseline="middle"
+          >{{ s.label }}: {{ s.percent }}%</text>
+        }
+      </svg>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      @for (s of slices; track s.label) {
+        <div class="legend-item">
+          <span class="legend-dot" [style.background]="s.color"></span>
+          <span class="legend-text">{{ s.label }}</span>
+          <span class="legend-count">{{ s.value }} reservas</span>
+          <span class="legend-pct">{{ s.percent }}%</span>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -55,6 +55,12 @@ export class PropietariosComponent implements OnInit {
   selectedOwnerVenues: any[] | null = null;
   loadingOwnerDetails = false;
   totalEarningsSum = 0;
+  ownerModalError: string | null = null;
+
+  // Flags para rastrear si cada petición terminó (éxito o error)
+  private _detailsDone = false;
+  private _venuesDone = false;
+  private _paymentsDone = false;
 
   // Reminder modal state
   showReminderModal = false;
@@ -225,6 +231,12 @@ export class PropietariosComponent implements OnInit {
     this.selectedOwnerVenues = null;
     this.payments = null;
     this.totalEarningsSum = 0;
+    this.ownerModalError = null;
+
+    // Resetear flags de finalización
+    this._detailsDone = false;
+    this._venuesDone = false;
+    this._paymentsDone = false;
 
     let token = '';
     if (typeof localStorage !== 'undefined') {
@@ -240,12 +252,14 @@ export class PropietariosComponent implements OnInit {
     this.http.get<any>(`${environment.apiUrl}/host-detail/${hostId}`, { headers }).subscribe({
       next: (details) => {
         this.selectedOwnerDetails = details;
+        this._detailsDone = true;
         this.checkLoadingState();
       },
       error: (err) => {
         console.error('Error fetching host details:', err);
-        this.loadingOwnerDetails = false;
-        alert('No se pudieron cargar los detalles del dueño.');
+        this.ownerModalError = 'No se pudieron cargar los detalles del propietario.';
+        this._detailsDone = true;
+        this.checkLoadingState();
       }
     });
 
@@ -254,12 +268,14 @@ export class PropietariosComponent implements OnInit {
       next: (venues) => {
         this.selectedOwnerVenues = venues || [];
         this.totalEarningsSum = this.selectedOwnerVenues.reduce((sum, v) => sum + (v.totalEarnings || 0), 0);
+        this._venuesDone = true;
         this.checkLoadingState();
       },
       error: (err) => {
         console.error('Error fetching host venues:', err);
-        this.loadingOwnerDetails = false;
-        alert('No se pudieron cargar los salones del dueño.');
+        this.selectedOwnerVenues = [];
+        this._venuesDone = true;
+        this.checkLoadingState();
       }
     });
 
@@ -275,11 +291,13 @@ export class PropietariosComponent implements OnInit {
           amount: item.monto,
           status: item.estado === 2 || item.estado === '2' ? 'Pagado' : `Estado ${item.estado}`
         }));
+        this._paymentsDone = true;
         this.checkLoadingState();
       },
       error: (err) => {
         console.error('Error fetching payments:', err);
         this.payments = [];
+        this._paymentsDone = true;
         this.checkLoadingState();
       }
     });
@@ -305,8 +323,10 @@ export class PropietariosComponent implements OnInit {
   }
 
   checkLoadingState(): void {
-    if (this.selectedOwnerDetails !== null && this.selectedOwnerVenues !== null && this.payments !== null) {
+    // El loading termina cuando los 3 requests finalizaron (éxito O error)
+    if (this._detailsDone && this._venuesDone && this._paymentsDone) {
       this.loadingOwnerDetails = false;
+      this.cdr.detectChanges();
     }
   }
 
