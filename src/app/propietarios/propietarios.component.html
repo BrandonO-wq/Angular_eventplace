@@ -225,7 +225,11 @@
           </td>
           <!-- Último pago -->
           <td>
-            <span class="last-payment-date">{{ formatDate(host.deadlineLastPeriod) }}</span>
+            @if (host.loadingLastPayment) {
+              <span class="last-payment-date" style="opacity: 0.5;">Cargando...</span>
+            } @else {
+              <span class="last-payment-date">{{ formatDate(host.lastPaymentDate) }}</span>
+            }
           </td>
           <!-- Acciones -->
           <td class="text-right">

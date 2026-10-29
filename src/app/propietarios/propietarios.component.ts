@@ -18,6 +18,8 @@ interface RegisteredHost {
   commissionLastPeriod: number;
   deadlineLastPeriod: string | null;
   statusLastPeriod: string | null; // 'PENDING' | 'PAID' | 'OVERDUE' | 'LEGACY_PENDING' | null
+  lastPaymentDate?: string | null;
+  loadingLastPayment?: boolean;
 }
 
 @Component({
@@ -82,11 +84,7 @@ export class PropietariosComponent implements OnInit {
     }
   }
 
-  fetchHosts(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.errorData = false;
-
+  private getToken(): string {
     let token = '';
     try {
       if (typeof localStorage !== 'undefined') {
@@ -95,8 +93,17 @@ export class PropietariosComponent implements OnInit {
     } catch (e) {
       console.error('Error accessing localStorage:', e);
     }
+    return token;
+  }
 
-    this.http.get<RegisteredHost[]>(`${environment.apiUrl}/host-debts/registered-hosts`, {
+  fetchHosts(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.errorData = false;
+
+    const token = this.getToken();
+
+    this.http.get<any[]>(`${environment.apiUrl}/host-debts/registered-hosts`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'ngrok-skip-browser-warning': '69420'
@@ -106,7 +113,10 @@ export class PropietariosComponent implements OnInit {
       retry({ count: 2, delay: 1500 })
     ).subscribe({
       next: (data) => {
-        this.hosts = data;
+        this.hosts = (data || []).map(item => ({
+          ...item,
+          lastPaymentDate: item.lastPaymentDate || item.lastPayment || item.fechaUltimoPago || undefined
+        }));
         this.calculateKPIs();
         this.applyFilters();
         this.loading = false;
@@ -182,6 +192,42 @@ export class PropietariosComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     this.pagedHosts = this.filteredHosts.slice(startIndex, endIndex);
+    this.loadLastPaymentsForPagedHosts();
+  }
+
+  loadLastPaymentsForPagedHosts(): void {
+    const token = this.getToken();
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'ngrok-skip-browser-warning': '69420'
+    };
+
+    this.pagedHosts.forEach(host => {
+      // Si ya tiene el campo definido (fecha o null) o ya está en curso, no repetir
+      if (host.lastPaymentDate !== undefined || host.loadingLastPayment || !host.hostId) {
+        return;
+      }
+      host.loadingLastPayment = true;
+      this.http.get<any[]>(`${environment.apiUrl}/host-debts/payments?hostId=${host.hostId}`, { headers }).subscribe({
+        next: (data) => {
+          host.loadingLastPayment = false;
+          const paidPayments = (data || []).filter(item => item.fechaPago);
+          if (paidPayments.length > 0) {
+            paidPayments.sort((a, b) => new Date(b.fechaPago).getTime() - new Date(a.fechaPago).getTime());
+            host.lastPaymentDate = paidPayments[0].fechaPago;
+          } else {
+            host.lastPaymentDate = null;
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error(`Error fetching payments for host ${host.hostId}:`, err);
+          host.loadingLastPayment = false;
+          host.lastPaymentDate = null;
+          this.cdr.detectChanges();
+        }
+      });
+    });
   }
 
   goToPage(page: number): void {
@@ -192,10 +238,11 @@ export class PropietariosComponent implements OnInit {
   }
 
   // Helper formatting methods
-  formatDate(dateStr: string | null): string {
+  formatDate(dateStr: string | null | undefined): string {
     if (!dateStr) return '-';
     try {
       const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
       const day = String(d.getDate()).padStart(2, '0');
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const year = d.getFullYear();
@@ -291,6 +338,17 @@ export class PropietariosComponent implements OnInit {
           amount: item.monto,
           status: item.estado === 2 || item.estado === '2' ? 'Pagado' : `Estado ${item.estado}`
         }));
+        // Sincronizar también lastPaymentDate para este propietario
+        const currentHost = this.hosts.find(h => h.hostId === hostId);
+        if (currentHost) {
+          const paidPayments = (data || []).filter(item => item.fechaPago);
+          if (paidPayments.length > 0) {
+            paidPayments.sort((a, b) => new Date(b.fechaPago).getTime() - new Date(a.fechaPago).getTime());
+            currentHost.lastPaymentDate = paidPayments[0].fechaPago;
+          } else {
+            currentHost.lastPaymentDate = null;
+          }
+        }
         this._paymentsDone = true;
         this.checkLoadingState();
       },
